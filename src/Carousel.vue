@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div class="vue-carousel">
     </div>
 </template>
-<style>
-    body{
-        background-color:#ff0000;
+<style lang="less">
+    .vue-carousel{
+
     }
 </style>
 <script>
