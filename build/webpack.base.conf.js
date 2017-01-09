@@ -1,11 +1,12 @@
 var path = require('path'),
 	config = require('./conf');
+var projectRoot = path.resolve(__dirname, '../');
 
 module.exports = {
 	entry: {
 		app: './demo/src/main.js'
 	},
-	output:{
+	output: {
 		path: config.path.demoJS,
 		filename: '[name].js'
 	},
@@ -13,17 +14,19 @@ module.exports = {
 		extensions: ['', '.js', '.vue'],
 		fallback: [path.join(__dirname, '../node_modules')]
 	},
-	loaders: [
-		{
-			test: /\.vue$/,
-			loader: 'vue'
-		},
-		{
-			test: /\.js$/,
-			loader: 'babel',
-			query: {
-				presets: ["es2015", "stage-2"]
+	resolveLoader: {
+		fallback: [path.join(__dirname, '../node_modules')]
+	},	
+	module: {
+		loaders: [
+			{
+				test: /\.vue$/,
+				loader: 'vue-loader'
+			},
+			{
+				test: /\.js$/,
+				loader: 'babel-loader'
 			}
-		}
-	]
+		]
+	}
 };
