@@ -1,8 +1,6 @@
 <template>
     <div>Hello</div>
 </template>
-<style lang="less">
-</style>
 <script>
 export default {
     data() {
@@ -11,3 +9,5 @@ export default {
     }
 }
 </script>
+<style lang="less">
+</style>
