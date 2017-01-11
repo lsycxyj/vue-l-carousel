@@ -38,9 +38,11 @@
         <div class="v-carousel-items">
             <slot></slot>
         </div>
-        <div class="v-carousel-dots" v-if="indicators">
+        <div class="v-carousel-dots" v-if="dots">
             <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-for="(item, index) in watchItems"></div>
         </div>
+        <div class="v-carousel-next"></div>
+        <div class="v-carousel-prev"></div>
     </div>
 </template>
 
@@ -53,6 +55,14 @@ const
 
 export default {
     props: {
+        prevHTML: {
+            type: String,
+            default: '&lt;'
+        },
+        nextHTML: {
+            type: String,
+            default: '&gt;'
+        },
         speed: {
             type: Number,
             default: 300
@@ -65,7 +75,7 @@ export default {
             type: Number,
             default: 0
         },
-        indicators: {
+        dots: {
             type: Boolean,
             default: true
         },
