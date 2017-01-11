@@ -11,17 +11,22 @@
 			<slot></slot>
 		</div>
 	</script>
+	<script type="text/x-template" id="tplApp">
+		<div id="app">
+			<div>{{msg}}</div>
+			<comp>
+				<div v-for="(i, j) in list">{{i.id}}</div>
+			</comp>
+			<button @click="changeList()">Change List</button>
+		</div>
+	</script>
 </head>
 <body>
 <div id="body">
-	<div>{{msg}}</div>
-	<comp>
-		<div v-for="(i, j) in list">{{i.id}}</div>
-	</comp>
-	<button @click="changeList()">Change List</button>
 </div>
 
-<script src="src/vue.min.js"></script>
-<script src="src/main2.js"></script>
+<!--<script src="src/vue.min.js"></script>-->
+<!--<script src="src/main2.js"></script>-->
+<script src="js/app.js"></script>
 </body>
 </html>

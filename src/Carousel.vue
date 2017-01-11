@@ -28,12 +28,11 @@
 </style>
 
 <template>
-    <div
-        class="v-carousel"
-        @touchstart="onTouchstart"
-        @touchmove="onTouchmove"
-        @touchend="onTouchend"
-        @touchcancel="onTouchcancel">
+    <!--
+        Don't use v-bind to bind events which are not available,
+        Otherwise Vue will go on running with many bugs sliently as in many other places.
+    -->
+    <div class="v-carousel">
         <div class="v-carousel-items">
             <slot></slot>
         </div>
@@ -71,8 +70,8 @@ export default {
     data() {
         return {
             activeIndex: 0,
-            //watchItems: this.watchItems
+            _watchItems: this.watchItems
         };
-    }
+    },
 }
 </script>

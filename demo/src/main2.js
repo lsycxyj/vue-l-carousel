@@ -1,6 +1,6 @@
 var comp = {
 	template: '#tplComp',
-	data: function(){
+	data: function () {
 		return {
 			msg: 'hello'
 		}
@@ -18,17 +18,28 @@ var list1 = [
 		}
 	];
 
-Vue.component('comp', comp);
-
-new Vue({
-	el: '#body',
-	data: {
-		msg: 'hello',
-		list: list1
+var app = {
+	template: '#tplApp',
+	data: function () {
+		return {
+			msg: 'hello',
+			list: list1
+		};
+	},
+	components: {
+		comp: comp
 	},
 	methods: {
 		changeList: function () {
 			this.list = this.list == list1 ? list2 : list1
 		}
+	}
+}
+
+new Vue({
+	el: '#body',
+	template: '<app></app>',
+	components: {
+		app: app
 	}
 });

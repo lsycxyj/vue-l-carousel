@@ -3,10 +3,9 @@
 <template>
     <div id="app">
         <h3>Vue Carousel Example</h3>
-        <carousel :on-slide-end="onSlideEnd" :auto="auto">
-            <!-- Don't do event binding here. It won't work due to Vue's implementation. -->
-            <carousel-item v-for="(item, index) in list">
-                <p @click="log(index)">CarouselItem{{index}}, URL is {{item.url}}</p>
+        <carousel :auto="auto" :watchItems="list">
+            <carousel-item v-for="(item, index) in list" @click="log(index)">
+                <p>CarouselItem{{index}}, URL is {{item.url}}</p>
             </carousel-item>
         </carousel>
         <button @click="toggleAuto()">toggle auto</button>
