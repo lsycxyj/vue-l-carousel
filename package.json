@@ -25,7 +25,8 @@
   "license": "GPL-3.0",
   "homepage": "https://bitbucket.org/lsycxyj/vue-carousel#readme",
   "dependencies": {
-    "vue": "^2.1.8"
+    "vue": "^2.1.8",
+    "vue-tap": "^1.0.3"
   },
   "devDependencies": {
     "babel-core": "^6.21.0",

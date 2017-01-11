@@ -3,7 +3,7 @@
     &-items {
         overflow: hidden;
     }
-    &-indicators {
+    &-dots {
         position: absolute;
         bottom: 10px;
         left: 0;
@@ -11,15 +11,17 @@
         text-align: center;
     }
     &-dot {
+        &.active {
+            background: #000;
+            cursor: default;
+        }
+        cursor: pointer;
         display: inline-block;
         width: 10px;
         height: 10px;
         margin: 0 5px;
         border-radius: 5px;
         background: rgba(0, 0, 0, .5);
-        &:active {
-            background: #000;
-        }
     }
     width: 100%;
     overflow: hidden;
@@ -30,20 +32,31 @@
 <template>
     <!--
         Don't use v-bind to bind events which are not available,
-        Otherwise Vue will go on running with many bugs sliently as in many other places.
+        Otherwise Vue will go on rendering with many bugs sliently as in many other places.
     -->
     <div class="v-carousel">
         <div class="v-carousel-items">
             <slot></slot>
         </div>
-        <div class="v-carousel-indicators" v-if="indicators">
+        <div class="v-carousel-dots" v-if="indicators">
+            <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-for="(item, index) in watchItems"></div>
         </div>
     </div>
 </template>
 
 <script>
+const
+    //detect fast click
+    EV_TOUCH_START = 'touchstart',
+    EV_TOUCH_END = 'touchend',
+    EV_TOUCH_MOVE = 'touchmove';
+
 export default {
     props: {
+        speed: {
+            type: Number,
+            default: 300
+        },
         loop: {
             type: Boolean,
             default: true
@@ -69,9 +82,30 @@ export default {
     },
     data() {
         return {
-            activeIndex: 0,
-            _watchItems: this.watchItems
+            activeIndex: 0
         };
     },
+    mounted() {
+        var me = this,
+            el = me.$el;
+
+        me.$watch('watchItems', function(n, o){
+            me.updateRender();
+        });
+    },
+    destroyed() {
+    },
+    methods: {
+        //Event callbacks
+        onDotTap(index) {
+        },
+        updateRender() {
+            var me = this;
+            me.updateItems();
+            me.updateDots();
+        },
+        updateItems() {
+        }
+    }
 }
 </script>

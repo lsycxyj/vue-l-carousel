@@ -36,6 +36,9 @@ var list1 = [
     },
     {
         url: 'url6'
+    },
+    {
+        url: 'url7'
     }
 ],
     log = console.log;
