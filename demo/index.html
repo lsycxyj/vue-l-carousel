@@ -5,10 +5,23 @@
 	<meta name="viewport"
 	      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
 	<title>vue-carousel examples</title>
+	<script type="text/x-template" id="tplComp">
+		<div class="comp">
+			<p>{{msg}}</p>
+			<slot></slot>
+		</div>
+	</script>
 </head>
 <body>
 <div id="body">
+	<div>{{msg}}</div>
+	<comp>
+		<div v-for="(i, j) in list">{{i.id}}</div>
+	</comp>
+	<button @click="changeList()">Change List</button>
 </div>
-<script src="js/app.js"></script>
+
+<script src="src/vue.min.js"></script>
+<script src="src/main2.js"></script>
 </body>
 </html>

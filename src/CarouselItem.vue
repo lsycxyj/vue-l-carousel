@@ -1,16 +1,23 @@
+<style lang="less">
+.v-carousel {
+	&-item {
+		width: 100%;
+		float: left;
+	}
+}
+</style>
+
 <template>
-	<div>
+	<div class="v-carousel-item">
+		<slot></slot>
 	</div>
 </template>
-<style lang="less">
-</style>
+
 <script>
-	export default{
-		data() {
-			return {
-				msg: 'hello vue'
-			}
-		},
-		components: {}
+export default{
+	data() {
+		return {
+		}
 	}
+}
 </script>

@@ -37,8 +37,10 @@
     "css-loader": "^0.26.1",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
-    "vue-loader": "^10.0.2",
-    "vue-template-compiler": "^2.1.8",
+    "url-loader": "^0.5.7",
+    "vue-loader": "^10.0.0",
+    "vue-style-loader": "^1.0.0",
+    "vue-template-compiler": "^2.1.0",
     "webpack": "^1.14.0",
     "webpack-merge": "^2.3.1"
   }
