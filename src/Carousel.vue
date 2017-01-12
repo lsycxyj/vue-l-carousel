@@ -65,6 +65,8 @@
 </template>
 
 <script>
+import VueFclickLite from './VueFclickLite'
+
 const
     EV_TOUCH_START = 'touchstart',
     EV_TOUCH_END = 'touchend',
@@ -111,6 +113,9 @@ export default {
         return {
             activeIndex: 0
         };
+    },
+    directives: {
+        fclick: VueFclickLite
     },
     mounted() {
         var me = this,
