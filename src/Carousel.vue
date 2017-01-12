@@ -23,6 +23,22 @@
         border-radius: 5px;
         background: rgba(0, 0, 0, .5);
     }
+    &-nav{
+        @h: 30px;
+        &.prev{
+
+        }
+        &.next{
+
+        }
+        position: absolute;
+        line-height: @h;
+        color: #FFF;
+        padding: 0 5px;
+        background: rgba(0, 0, 0, .5);
+        top: 50%;
+        margin-top: -@h / 2;
+    }
     width: 100%;
     overflow: hidden;
     position: relative;
@@ -35,20 +51,21 @@
         Otherwise Vue will go on rendering with many bugs sliently as in many other places.
     -->
     <div class="v-carousel">
+        <slot name="before"></slot>
         <div class="v-carousel-items">
             <slot></slot>
         </div>
         <div class="v-carousel-dots" v-if="dots">
             <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-for="(item, index) in watchItems"></div>
         </div>
-        <div class="v-carousel-next"></div>
-        <div class="v-carousel-prev"></div>
+        <div class="v-carousel-nav next" v-html="prevHTML"></div>
+        <div class="v-carousel-nav prev" v-html="nextHTML"></div>
+        <slot name="after"></slot>
     </div>
 </template>
 
 <script>
 const
-    //detect fast click
     EV_TOUCH_START = 'touchstart',
     EV_TOUCH_END = 'touchend',
     EV_TOUCH_MOVE = 'touchmove';
