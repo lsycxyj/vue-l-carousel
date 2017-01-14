@@ -1,148 +1,107 @@
-//jQuery Lite
-//Core
-var 
-	doc = document,
-	simpleSelectorRE = /^[\w-]*$/, 
+var win = window,
+	simpleSelectorRE = /^[\w-]*$/,
+	cssNumber = { 'column-count': 1, 'columns': 1, 'font-weight': 1, 'line-height': 1,'opacity': 1, 'z-index': 1, 'zoom': 1 },
 
-	z = {
-		init(selector, context) {
-			var dom;
+	emptyArr = [],
+	slice = emptyArr.slice,
+	
+	round = Math.round; 
 
-			if(!selector) {
-				return z.Z();
-			}
-			else if(isString(selector)) {
-				if (context !== undefined) {
-					return $(context).find(selector);
-				}
-				else {
-					dom = z.qsa(doc, selector);
-				}
-			}
-			else if (z.isZ(selector)) {
-				return selector;
-			}
-			else {
-				//Wrap DOM nodes
-				dom = [selector];
-			}
-
-			return z.Z(dom, selector);
-		},
-		qsa(element, selector) {
-			var found,
-				maybeID = selector[0] == '#',
-				maybeClass = !maybeID && selector[0] == '.',
-				nameOnly = maybeID || maybeClass ? selector.slice(1) : selector, // Ensure that a 1 char tag name still gets checked
-				isSimple = simpleSelectorRE.test(nameOnly)
-					return (element.getElementById && isSimple && maybeID) ? // Safari DocumentFragment doesn't have getElementById
-						( (found = element.getElementById(nameOnly)) ? [found] : [] ) :
-						(element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) ? [] :
-						slice.call(
-							isSimple && !maybeID && element.getElementsByClassName ? // DocumentFragment doesn't have getElementsByClassName/TagName
-							maybeClass ? element.getElementsByClassName(nameOnly) : // If it's simple, it could be a class
-							element.getElementsByTagName(selector) : // Or a tag
-							element.querySelectorAll(selector) // Or it's not simple, and we need to query all
-						)
-		},
-		isZ(obj) {
-			return obj instanceof Z;
-		},
-		Z(dom, selector) {
-			return new Z(dom, selector);
-		}
-	},
-
-	isArray = Array.isArray || function(arr) { return arr instanceof Array}
-
-	fn;
-
-function Z(dom, selector){
-	var i, me = this, len = dom ? dom.length : 0;
-	for (i = 0; i < len) me[i] = dom[i];
-	me.length = len;
-	me.selector = selector || '';
+function qsa(element, selector) {
+	var found,
+		maybeID = selector[0] == '#',
+		maybeClass = !maybeID && selector[0] == '.',
+		nameOnly = maybeID || maybeClass ? selector.slice(1) : selector, // Ensure that a 1 char tag name still gets checked
+		isSimple = simpleSelectorRE.test(nameOnly)
+	return (element.getElementById && isSimple && maybeID) ? // Safari DocumentFragment doesn't have getElementById
+		( (found = element.getElementById(nameOnly)) ? [found] : [] ) :
+		(element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) ? [] :
+		slice.call(
+			isSimple && !maybeID && element.getElementsByClassName ? // DocumentFragment doesn't have getElementsByClassName/TagName
+				maybeClass ? element.getElementsByClassName(nameOnly) : // If it's simple, it could be a class
+				element.getElementsByTagName(selector) : // Or a tag
+				element.querySelectorAll(selector) // Or it's not simple, and we need to query all
+		)
 }
 
-function $(selector, context) {
-	return z.init(selector, context);
+function on(element, ev, callback) {
+	element.addEventListener(ev, callback);
 }
 
-fn = $.fn = {
-	length: 0,
-	map(cb) {
-	},
-	find(selector) {
-		var result, $this = this;
+function off(element, ev, callback) {
+	element.removeEventListener(ev, callback);
+}
 
-		if(!selector) {
-			result = $();
-		}
-		else if($this.length == 1) {
-			result = $(z.qsa($this[0], selector));
+function attr(element, name) {
+	return element.getAttribute(name);
+}
+
+function camelize(str) { 
+	return str.replace(/-+(.)?/g, function(match, chr){ 
+		return chr ? chr.toUpperCase() : '' 
+	});
+}
+
+function dasherize(str) {
+	return str.replace(/::/g, '/')
+		   .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+		   .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+		   .replace(/_/g, '-')
+		   .toLowerCase()
+}
+
+function maybeAddPx(name, value) {
+	return (typeof value == "number" && !cssNumber[dasherize(name)]) ? value + "px" : value
+}
+
+function css(element, property, value) {
+	var elementSytle = element.style;
+	if (arguments.length < 3) {
+		return elementSytle[camelize(property)] || getComputedStyle(element, '').getPropertyValue(property);
+	}
+	else {
+		if(!value && value !== 0) {
+			elementSytle.removeProperty(dasherize(key));
 		}
 		else {
-			result = $this.map(function() {
-				return z.qsa(this, selector);
-			});
+			elementSytle.cssText += dasherize(property) + ':' + maybeAddPx(value);
 		}
-
-		return result;
-	},
-	eq(idx) {
 	}
+}
+
+function each(elements, callback) {
+	for(var i = 0, len = elements.length, element; i < len; i++) {
+		element = elements[i];
+		callback.call(element, element, i);
+	}
+}
+
+function offset(element) {
+	var obj = element.getBoundingClientRect();
+	return {
+		left: obj.left + win.pageXOffset,
+		top: obj.top + win.pageYOffset,
+		width: round(obj.width),
+		height: round(obj.height)
+	};
+}
+
+function width(element) {
+	return offset(element).width();
+}
+
+var $ = {
+	qsa,
+	on,
+	off,
+	attr,
+	css,
+	each,
+	offset,
+	width
 };
 
-$.prototype = Z.prototype = fn;
 
-//helpers
-function type(o) {
-	return typeof o;
-}
-
-function each() {
-}
-
-function map() {
-}
-
-function isWindow(obj) {
-	return obj != null && obj == obj.window;
-}
-
-function isObject(obj) {
-	return type(obj) == 'object';
-}
-
-function isFunction(func) {
-	return type(func) == 'function';
-}
-
-function isString(str) {
-	return type(str) == 'string';
-}
-
-function extend(o, n) {
-	return Object.assign(o, n);
-}
-
-function likeArray(obj) {
-	var length = !!obj && 'length' in obj && obj.length,
-		type = type(obj);
-}
-
-extend($, {
-	isArray,
-	type,
-	isWindow,
-	isObject,
-	isFunction,
-	isString,
-	extend
-});
-
-//Event
-fn.on = function(e, selector, data, callback) {
+export default {
+	$
 };
-
-export $;
