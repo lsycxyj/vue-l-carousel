@@ -56,16 +56,17 @@
             <slot></slot>
         </div>
         <div class="v-carousel-dots" v-if="dots">
-            <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-for="(item, index) in watchItems"></div>
+            <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-fclick="to(index)" v-for="(item, index) in watchItems"></div>
         </div>
-        <div class="v-carousel-nav next" v-html="prevHTML"></div>
-        <div class="v-carousel-nav prev" v-html="nextHTML"></div>
+        <div class="v-carousel-nav prev" v-fclick="prev()" v-html="nextHTML"></div>
+        <div class="v-carousel-nav next" v-fclick="next()" v-html="prevHTML"></div>
         <slot name="after"></slot>
     </div>
 </template>
 
 <script>
-import VueFclickLite from './VueFclickLite'
+import VueFclickLite from './VueFclickLite';
+import {$} from './util';
 
 const
     EV_TOUCH_START = 'touchstart',
@@ -111,7 +112,8 @@ export default {
     },
     data() {
         return {
-            activeIndex: 0
+            activeIndex: 0,
+            $items: null
         };
     },
     directives: {
@@ -119,8 +121,10 @@ export default {
     },
     mounted() {
         var me = this,
-            el = me.$el;
+            $el = me.$el,
+            $items = $el.querySelectorAll('v-carousel-items')[0];
 
+        me.$items = $items;
         me.$watch('watchItems', function(n, o){
             me.updateRender();
         });
@@ -128,15 +132,17 @@ export default {
     destroyed() {
     },
     methods: {
-        //Event callbacks
-        onDotTap(index) {
-        },
         updateRender() {
             var me = this;
             me.updateItems();
-            me.updateDots();
         },
         updateItems() {
+        },
+        next() {
+        }
+        prev() {
+        },
+        to(index) {
         }
     }
 }
