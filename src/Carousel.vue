@@ -26,10 +26,10 @@
     &-nav{
         @h: 30px;
         &.prev{
-
+            left: 0;
         }
         &.next{
-
+            right: 0;
         }
         position: absolute;
         line-height: @h;
@@ -58,8 +58,8 @@
         <div class="v-carousel-dots" v-if="dots">
             <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-fclick="to(index)" v-for="(item, index) in watchItems"></div>
         </div>
-        <div class="v-carousel-nav prev" v-fclick="{cb:prev}" v-html="nextHTML"></div>
-        <div class="v-carousel-nav next" v-fclick="{cb:next}" v-html="prevHTML"></div>
+        <div class="v-carousel-nav prev" v-fclick="{cb:prev}" v-html="prevHTML"></div>
+        <div class="v-carousel-nav next" v-fclick="{cb:next}" v-html="nextHTML"></div>
         <slot name="after"></slot>
     </div>
 </template>
@@ -74,9 +74,15 @@ const win = window,
     hasTouch = !!('ontouchstart' in win || navigator.maxTouchPoints),
     vendor = (/webkit/i).test(ua) ? 'webkit' : (/firefox/i).test(ua) ? 'moz' : 'opera' in win ? 'o' : (/msie/i).test(ua) ? 'ms' : '',
 
+    DIR_PREV = 'prev',
+    DIR_NEXT = 'next',
+
     EV_TOUCH_START = 'touchstart',
     EV_TOUCH_END = 'touchend',
     EV_TOUCH_MOVE = 'touchmove',
+
+    EV_MOUSE_ENTER = 'mouseenter',
+    EV_MOUSE_LEAVE = 'mouseleave',
 
     EV_MOUSE_DOWN = 'mousedown',
     EV_MOUSE_UP = 'mouseup',
@@ -96,6 +102,12 @@ var $ = util.$,
     doCSS = $.css,
     getWidth = $.getWidth,
     each = $.each;
+
+//TODO speed up
+function roundDown(oVal) {
+    var val = parseInt(oVal, 10);
+    return Math.ceil((val - (val % 100)) / 100) * 100;
+}
 
 export default {
     props: {
@@ -140,7 +152,8 @@ export default {
             activeIndex: 0,
             transition: 'none',
             transform: '',
-            slideCount: 0,
+            itemsLen: 0,
+            autoTimer: null,
             $items: null
         };
     },
@@ -157,14 +170,12 @@ export default {
 
         me.$itemsWrap = $itemsWrap;
 
-        //me.$watch('watchItems', function(n, o){
-        //    updateRender();
-        //});
-        //updateRender();
+        me.$watch('watchItems', updateRender);
+        me.$watch('auto', checkAuto);
+
+        updateRender();
     },
-    update() {
-        console.log('update');
-    },
+    //Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
     destroyed() {
     },
     methods: {
@@ -173,32 +184,93 @@ export default {
 
                 loop = me.loop,
                 watchItems = me.watchItems,
-                //slideCount = loop && ? 
+                itemsLen = watchItems.length,
+                slideCount = loop && itemsLen > 1 ? itemsLen + 2 : itemsLen, 
 
                 $itemsWrap = me.$itemsWrap,
-                $items = findChildren($el, '.v-carousel-item'),
+                $items = findChildren($itemsWrap, '.v-carousel-item'),
 
                 transition = 'transform ' + (me.speed / 1000) + 's ease';
 
             me.$items = $items;
+            me.itemsLen = itemsLen;
 
             //reset reset animation
             me.transtion = 'none';
-            me.nextTick(function() {
-                me.to(0);
-                me.transtion = transtion;
+            me.$nextTick(function() {
+                me.reset();
+
+                each($items, function(element){
+                    doCSS(element, 'width', (100 / slideCount) + '%');
+                });
+
+                me.transition = transition;
+
+                me.checkAuto();
             });
 
-            me.updateItems();
         },
-        updateItems() {
+        reset() {
+            var me = this;
+            me.off();
+            me.to(0);
+        },
+        checkAuto() {
+            var me = this,
+                auto = me.auto,
+
+                turnOff = me.off,
+                turnOn = me.on,
+
+                $itemsWrap = me.$itemsWrap;
+
+            unbindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
+            unbindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
+            unbindEvent($itemsWrap, EV_START, turnOff);
+            unbindEvent($itemsWrap, EV_END, turnOn);
+
+            if(auto) {
+                bindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
+                bindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
+                bindEvent($itemsWrap, EV_START, turnOff);
+                bindEvent($itemsWrap, EV_END, turnOn);
+                turnOn();
+            }
+            else {
+                turnOff();
+            }
+        },
+        on() {
+            var me = this;
+            me.off();
+            me.autoTimer = setInterval(function(){
+                me.next();
+            }, me.auto);
+        },
+        off() {
+            var me = this;
+            if(me.autoTimer) {
+                clearInterval(me.autoTimer);
+                me.autoTimer = null;
+            }
         },
         next() {
+            this.nextPrev(DIR_NEXT);
         },
         prev() {
-            console.log(arguments, '')
+            this.nextPrev(DIR_PREV);
+        },
+        nextPrev(dir) {
+            var me = this,
+                loop = me.loop,
+                itemsLen = 
+                activeIndex = me.activeIndex;
         },
         to(index) {
+            var me = this,
+                loop = me.loop,
+                activeIndex = me.activeIndex,
+                itemsLen = me.itemsLen;
         },
         transTo(moveTo) {
             me.transform = 'translate3d(0,0,0)';

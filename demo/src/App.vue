@@ -35,9 +35,6 @@ var list1 = [
         url: 'url5'
     },
     {
-        url: 'url6'
-    },
-    {
         url: 'url7'
     }
 ],
