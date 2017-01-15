@@ -257,7 +257,7 @@ export default {
         addAnim: function() {
             var me = this;
             me.transition = 'transform ' + (me.speed / 1000) + 's ease';
-        }
+        },
         on() {
             var me = this;
             me.off();
@@ -416,7 +416,7 @@ export default {
 
             function dragsnap(dir){
                 me.nextPrev(dir);
-            },
+            }
             
             bindEvent($itemsWrap, EV_MOVE, moveHandler);
             oneEvent($itemsWrap, EV_END, function(e) {
