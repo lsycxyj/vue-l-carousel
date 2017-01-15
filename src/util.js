@@ -32,6 +32,14 @@ function off(element, ev, callback) {
 	element.removeEventListener(ev, callback);
 }
 
+function one(element, ev, callback) {
+	function handler(){
+		callback.apply(this, arguments);
+		off(element, ev, handler);
+	}
+	on(element, ev, handler);
+}
+
 function attr(element, name) {
 	return element.getAttribute(name);
 }
@@ -51,7 +59,7 @@ function dasherize(str) {
 }
 
 function maybeAddPx(name, value) {
-	return (typeof value == "number" && !cssNumber[dasherize(name)]) ? value + "px" : value
+	return (typeof value == "number" && !cssNumber[dasherize(name)]) ? value + "px" : value;
 }
 
 function css(element, property, value) {
@@ -64,7 +72,7 @@ function css(element, property, value) {
 			elementSytle.removeProperty(dasherize(key));
 		}
 		else {
-			elementSytle.cssText += dasherize(property) + ':' + maybeAddPx(value);
+			elementSytle.cssText += dasherize(property) + ':' + maybeAddPx(property, value);
 		}
 	}
 }
@@ -94,6 +102,7 @@ var $ = {
 	qsa,
 	on,
 	off,
+	one,
 	attr,
 	css,
 	each,

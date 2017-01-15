@@ -98,6 +98,7 @@ var $ = util.$,
     findChildren = $.qsa,
     bindEvent = $.on,
     unbindEvent = $.off,
+    oneEvent = $.one,
     getAttr = $.attr,
     doCSS = $.css,
     getWidth = $.getWidth,
@@ -136,10 +137,6 @@ export default {
             type: Boolean,
             default: true
         },
-        delta: {
-            type: Number,
-            default: 100
-        },
         watchItems: {
             type: Array,
             default() {
@@ -153,6 +150,8 @@ export default {
             transition: 'none',
             transform: '',
             itemsLen: 0,
+            slideCount: 0,
+            hasLoop: false,
             autoTimer: null,
             $items: null
         };
@@ -166,45 +165,56 @@ export default {
             $el = me.$el,
             $itemsWrap = findChildren($el, '.v-carousel-items')[0],
             
-            updateRender = me.updateRender;
+            updateRender = me.updateRender,
+            adjRound = me.adjRound;
 
         me.$itemsWrap = $itemsWrap;
 
         me.$watch('watchItems', updateRender);
-        me.$watch('auto', checkAuto);
+        me.$watch('auto', me.checkAuto);
 
         updateRender();
+        adjRound();
+
+        bindEvent(win, EV_RESIZE, adjRound);
+        //DragSnap support
+        bindEvent($itemsWrap, EV_START, me.startCB);
     },
     //Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
     destroyed() {
+        unbindEvent(win, EV_RESIZE, me.adjRound);
+        unbindEvent(win, EV_START, me.startCB);
     },
     methods: {
         updateRender() {
             var me = this,
 
                 loop = me.loop,
+                hasLoop = loop && itemsLen > 1,
                 watchItems = me.watchItems,
                 itemsLen = watchItems.length,
-                slideCount = loop && itemsLen > 1 ? itemsLen + 2 : itemsLen, 
+                slideCount = hasLoop ? itemsLen + 2 : itemsLen, 
 
                 $itemsWrap = me.$itemsWrap,
-                $items = findChildren($itemsWrap, '.v-carousel-item'),
+                $items = findChildren($itemsWrap, '.v-carousel-item');
 
-                transition = 'transform ' + (me.speed / 1000) + 's ease';
-
+            me.hasLoop = hasLoop;
             me.$items = $items;
             me.itemsLen = itemsLen;
+            me.slideCount = slideCount;
 
-            //reset reset animation
-            me.transtion = 'none';
+            doCSS($itemsWrap, 'width', 100 * slideCount + '%');
+            each($items, function(element){
+                doCSS(element, 'width', (100 / slideCount) + '%');
+            });
+
+            me.rmAnim();
+            me.adjRound();
+
             me.$nextTick(function() {
                 me.reset();
 
-                each($items, function(element){
-                    doCSS(element, 'width', (100 / slideCount) + '%');
-                });
-
-                me.transition = transition;
+                me.addAnim();
 
                 me.checkAuto();
             });
@@ -240,6 +250,14 @@ export default {
                 turnOff();
             }
         },
+        rmAnim: function() {
+            //reset reset animation
+            me.transtion = 'none';
+        },
+        addAnim: function() {
+            var me = this;
+            me.transition = 'transform ' + (me.speed / 1000) + 's ease';
+        }
         on() {
             var me = this;
             me.off();
@@ -262,18 +280,179 @@ export default {
         },
         nextPrev(dir) {
             var me = this,
-                loop = me.loop,
-                itemsLen = 
-                activeIndex = me.activeIndex;
+                hasLoop = me.hasLoop,
+                itemsLen = me.itemsLen,
+                activeIndex = me.activeIndex,
+                index;
+
+            if(dir == DIR_PREV) {
+                if(activeIndex == 0 && hasLoop){
+                    index = -1;
+                }
+                else {
+                    index = 0;
+                }
+            }
+            //next
+            else {
+                if(activeIndex == itemsLen - 1 && hasLoop){
+                    index = itemsLen
+                }
+                else {
+                    index = itemsLen - 1;
+                }
+            }
+            me.to(activeIndex);
         },
         to(index) {
             var me = this,
-                loop = me.loop,
-                activeIndex = me.activeIndex,
-                itemsLen = me.itemsLen;
+                hasLoop = me.hasLoop,
+                itemsLen = me.itemsLen,
+                slideCount = me.slideCount,
+
+                removeAnimation = me.rmAnim,
+                addAnimation = me.addAnim,
+                go = me.to,
+
+                onSlideEnd,
+                realIndex,
+                left;
+                
+            if(hasLoop){
+                if(index == -1){
+                    onSlideEnd = function() {
+                        removeAnimation();
+                        me.$nextTick(function(){
+                            go(itemsLen - 1);
+                            addAnimation();
+                        });
+                    };
+                }
+                else if(index == itemsLen){
+                    onSlideEnd = function() {
+                        removeAnimation();
+                        me.$nextTick(function(){
+                            go(1);
+                            addAnimation();
+                        });
+                    };
+                }
+
+                realIndex = index + 1;
+            }
+            else {
+                realIndex = index;
+            }
+
+            left = roundDown(realIndex);
+
+            me.transTo(left, onSlideEnd);
         },
-        transTo(moveTo) {
-            me.transform = 'translate3d(0,0,0)';
+        transTo(moveTo, onSlideEnd) {
+            me.transform = `translate3d(${moveTo}%,0,0)`;
+        },
+        startCB(e) {
+            var me = this,
+                $el = me.$el,
+
+                getEventData = me.getEv,
+                removeAnimation = me.rmAnim,
+                addAnimation = me.addAnim,
+                getPercent = me.getPercent,
+                slideCount = me.slideCount,
+                snapback = me.snapback,
+
+                data = getEventData(e),
+                
+                start = {
+                    time: +new Date,
+                    coords: [
+                        data.pageX,
+                        data.pageY
+                    ],
+                    origin: $el,
+                    interacting: false
+                },
+                stop, deltaX, deltaY,
+
+                $itemsWrap = me.$itemsWrap,
+                elWidth = getWidth($el),
+                currentPos = getCurrentPos($itemsWrap);
+
+            function getCurrentPos($itemsWrap) {
+                return getAttr($itemsWrap, 'style') != undefined ? getPercent($itemsWrap) : 0;
+            }
+
+            function moveHandler(e) {
+                var data = getEventData(e);
+                stop = {
+                    time: +new Date,
+                    coords: [
+                        data.pageX,
+                        data.pageY
+                    ]
+                };
+                deltaX = Math.abs(start.coords[0] - data.pageX);
+                deltaY = Math.abs(start.coords[1] - data.pageY);
+
+                //move threashold
+                if (!start || deltaX < deltaY || deltaY > 10 || deltaX < 3) {
+                    return;
+                }
+
+                // prevent scrolling
+                if (deltaX >= 3) {
+                    start.interacting = true;
+                    var percent = currentPos + (((stop.coords - start.coords[0]) / elWidth) * 100 / slideCount);
+                    me.transform = `translate3d("${percent}%,0,0")`;
+                    e.preventDefault();
+                }               
+            }
+
+            function snapback($itemsWrap, left) {
+                var currentPos = getCurrentPos($itemsWrap),
+                    left = ((!left && currentPos < 0) ? roundDown(currentPos) - 100 : roundDown(currentPos)) / slideCount;
+            }
+
+            function dragsnap(dir){
+                me.nextPrev(dir);
+            },
+            
+            bindEvent($itemsWrap, EV_MOVE, moveHandler);
+            oneEvent($itemsWrap, EV_END, function(e) {
+                var activeIndex = me.activeIndex;
+                unbindEvent($itemsWrap, EV_MOVE, moveHandler);
+
+                removeAnimation();
+
+                if(start && stop) {
+                    var deltaX = Math.abs(start.coords[0] - stop.coords[0]),
+                        deltaY = Math.abs(start.coords[1] - stop.coords[1]),
+                        left = start.coords[0] > stop.coords[0],
+                        jumppoint;
+
+                    //move threashold
+                    if(deltaX > 20 && (deltaX > deltaY)) {
+                        e.preventDefault();
+                    }
+                    else {
+                        if(start.interacting) {
+                            snapback($itemsWrap, left);
+                        }
+                        return;
+                    }
+
+                    jumppoint = elWidth / 4;
+
+                    if(deltaX > jumppoint && (!left && activeIndex > 0 || left && activeIndex < me.itemsLen - 1)) {
+                        dragsnap(left ? DIR_PREV : DIR_NEXT);
+                    }
+                    else {
+                        snapback($itemsWrap, left)
+                    }
+                }
+                start = stop = undefined;
+            });
         },
         getEv(e) {
             var obj;
@@ -286,8 +465,8 @@ export default {
 
             return obj;
         },
-        getPercent() {
-            return getAttr(me.$itemsWrap, 'style').match(/transform:.*translate3d.*\((.*[0-9].*)%/i) && parseFloat(RegExp.$1);
+        getPercent(element) {
+            return getAttr(element, 'style').match(/transform:.*translate3d.*\((.*[0-9].*)%/i) && parseFloat(RegExp.$1);
         },
         //Account for iOS safari rounding problems
         adjRound() {
