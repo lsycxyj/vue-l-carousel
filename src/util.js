@@ -95,7 +95,7 @@ function offset(element) {
 }
 
 function width(element) {
-	return offset(element).width();
+	return offset(element).width;
 }
 
 var $ = {

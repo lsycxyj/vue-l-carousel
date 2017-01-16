@@ -47,7 +47,7 @@ export default {
     },
     data() {
         return {
-            auto: 3000,
+            auto: 0,
             list: list1
         };
     },

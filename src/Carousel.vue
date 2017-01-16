@@ -31,6 +31,7 @@
         &.next{
             right: 0;
         }
+        cursor: pointer;
         position: absolute;
         line-height: @h;
         color: #FFF;
@@ -56,7 +57,7 @@
             <slot></slot>
         </div>
         <div class="v-carousel-dots" v-if="dots">
-            <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-fclick="to(index)" v-for="(item, index) in watchItems"></div>
+            <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-fclick="{cb:function(){to(index)}}" v-for="(item, index) in watchItems"></div>
         </div>
         <div class="v-carousel-nav prev" v-fclick="{cb:prev}" v-html="prevHTML"></div>
         <div class="v-carousel-nav next" v-fclick="{cb:next}" v-html="nextHTML"></div>
@@ -116,7 +117,7 @@ var $ = util.$,
     oneEvent = $.one,
     getAttr = $.attr,
     doCSS = $.css,
-    getWidth = $.getWidth,
+    getWidth = $.width,
     each = $.each;
 
 //TODO speed up
@@ -267,7 +268,7 @@ export default {
         },
         rmAnim: function() {
             //reset reset animation
-            me.transtion = 'none';
+            this.transtion = 'none';
         },
         addAnim: function() {
             var me = this;
@@ -347,7 +348,7 @@ export default {
                     onSlideEnd = function() {
                         removeAnimation();
                         me.$nextTick(function(){
-                            go(1);
+                            go(0);
                             addAnimation();
                         });
                     };
@@ -359,11 +360,16 @@ export default {
                 realIndex = index;
             }
 
-            left = roundDown(realIndex);
+            left = realIndex * 100 / slideCount;
 
             me.transTo(left, onSlideEnd);
         },
         transTo(moveTo, onSlideEnd) {
+            var me = this,
+                $itemsWrap = me.$itemsWrap;
+            if(onSlideEnd){
+                oneEvent($itemsWrap, EV_TRANSITION_END, onSlideEnd);
+            }
             me.transform = `translate3d(${moveTo}%,0,0)`;
         },
         startCB(e) {
