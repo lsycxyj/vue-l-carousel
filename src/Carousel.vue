@@ -69,13 +69,28 @@ import VueFclickLite from './VueFclickLite';
 import util from './util';
 
 const win = window,
+    doc = document,
     navigator = win.navigator,
-    ua = navigator.userAgent || navigator.appVersion,
     hasTouch = !!('ontouchstart' in win || navigator.maxTouchPoints),
-    vendor = (/webkit/i).test(ua) ? 'webkit' : (/firefox/i).test(ua) ? 'moz' : 'opera' in win ? 'o' : (/msie/i).test(ua) ? 'ms' : '',
 
     DIR_PREV = 'prev',
     DIR_NEXT = 'next',
+
+    
+    EV_TRANSITION_END = function(){
+        var TRANSITION_ENDS = ['transitionend','OTransitionEnd','webkitTransitionEnd'],
+            i = 0, 
+            len = TRANSITION_ENDS.length, 
+            item,
+            el = doc.createElement('div'),
+            elStyle = el.style;
+        for(; i < len; i++){
+            item = TRANSITION_ENDS[i];
+            if(elStyle[item]){
+                return item;
+            }
+        }
+    }(),
 
     EV_TOUCH_START = 'touchstart',
     EV_TOUCH_END = 'touchend',
