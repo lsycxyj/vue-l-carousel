@@ -164,12 +164,15 @@ export default {
         return {
             activeIndex: 0,
             transition: 'none',
+            animPaused: true,
             transform: '',
             itemsLen: 0,
             slideCount: 0,
             hasLoop: false,
             autoTimer: null,
-            $items: null
+            $items: null，
+            $itemsWrap: null,
+            transEndCB: null
         };
     },
     directives: {
@@ -195,6 +198,12 @@ export default {
         bindEvent(win, EV_RESIZE, adjRound);
         //DragSnap support
         bindEvent($itemsWrap, EV_START, me.startCB);
+        bindEvent($itemsWrap, EV_TRANSITION_END, function(){
+            var transEndCB = me.transEndCB;
+            if(transEndCB){
+                transEndCB();
+            }
+        });
     },
     //Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
     destroyed() {
@@ -267,12 +276,15 @@ export default {
             }
         },
         rmAnim: function() {
+            var me = this;
             //reset reset animation
-            this.transtion = 'none';
+            me.transtion = 'none';
+            me.animPaused = true;
         },
         addAnim: function() {
             var me = this;
             me.transition = 'transform ' + (me.speed / 1000) + 's ease';
+            me.animPaused = false;
         },
         on() {
             var me = this;
@@ -372,16 +384,22 @@ export default {
 
             left = realIndex * -100 / slideCount;
 
-            me.transTo(left, onSlideEnd);
-        },
-        transTo(moveTo, onSlideEnd) {
-            var me = this,
-                $itemsWrap = me.$itemsWrap;
-            if(onSlideEnd){
-                console.log(EV_TRANSITION_END)
-                oneEvent($itemsWrap, EV_TRANSITION_END, onSlideEnd);
+            if(!onSlideEnd) {
+                if(me.animPaused) {
+                    me.activeIndex = index;
+                }
+                else {
+                    onSlideEnd = function(){
+                        me.activeIndex = index;
+                    };
+                }
             }
-            me.transform = `translate3d(${moveTo}%,0,0)`;
+
+            me.transEndCB = onSlideEnd;
+            me.transTo(left);
+        },
+        transTo(moveTo) {
+            this.transform = `translate3d(${moveTo}%,0,0)`;
         },
         startCB(e) {
             var me = this,
