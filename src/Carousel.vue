@@ -302,23 +302,33 @@ export default {
                 index;
 
             if(dir == DIR_PREV) {
-                if(activeIndex == 0 && hasLoop){
-                    index = -1;
+                if(activeIndex == 0){
+                    if(hasLoop) {
+                        index = -1;
+                    }
+                    else {
+                        index = 0;
+                    }
                 }
                 else {
-                    index = 0;
+                    index = activeIndex - 1;
                 }
             }
             //next
             else {
-                if(activeIndex == itemsLen - 1 && hasLoop){
-                    index = itemsLen
+                if(activeIndex == itemsLen - 1){
+                    if(hasLoop) {
+                        index = itemsLen;
+                    }
+                    else {
+                        index = itemsLen - 1;
+                    }
                 }
                 else {
-                    index = itemsLen - 1;
+                    index = activeIndex + 1;
                 }
             }
-            me.to(activeIndex);
+            me.to(index);
         },
         to(index) {
             var me = this,
@@ -348,7 +358,7 @@ export default {
                     onSlideEnd = function() {
                         removeAnimation();
                         me.$nextTick(function(){
-                            go(0);
+                            go(1);
                             addAnimation();
                         });
                     };
@@ -360,7 +370,7 @@ export default {
                 realIndex = index;
             }
 
-            left = realIndex * 100 / slideCount;
+            left = realIndex * -100 / slideCount;
 
             me.transTo(left, onSlideEnd);
         },
@@ -368,6 +378,7 @@ export default {
             var me = this,
                 $itemsWrap = me.$itemsWrap;
             if(onSlideEnd){
+                console.log(EV_TRANSITION_END)
                 oneEvent($itemsWrap, EV_TRANSITION_END, onSlideEnd);
             }
             me.transform = `translate3d(${moveTo}%,0,0)`;
