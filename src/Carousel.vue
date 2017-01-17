@@ -98,10 +98,12 @@ const win = window,
     EV_END = hasTouch ? EV_TOUCH_END : EV_MOUSE_UP;
 
 var $ = util.$,
-    findChildren = $.qsa,
+    findNodes = $.qsa,
     bindEvent = $.on,
     unbindEvent = $.off,
     oneEvent = $.one,
+    appendNode = $.append,
+    prependNode = $.prepend,
     getAttr = $.attr,
     doCSS = $.css,
     getWidth = $.width,
@@ -129,7 +131,7 @@ export default {
         },
         loop: {
             type: Boolean,
-            default: true
+            default: false
         },
         //0 for no autoplay
         auto: {
@@ -169,7 +171,7 @@ export default {
         var me = this,
 
             $el = me.$el,
-            $itemsWrap = findChildren($el, '.v-carousel-items')[0],
+            $itemsWrap = findNodes($el, '.v-carousel-items')[0],
             
             updateRender = me.updateRender,
             adjRound = me.adjRound;
@@ -199,9 +201,9 @@ export default {
             var me = this,
 
                 loop = me.loop,
-                hasLoop = loop && itemsLen > 1,
                 watchItems = me.watchItems,
                 itemsLen = watchItems.length,
+                hasLoop = loop && itemsLen > 1,
                 slideCount = hasLoop ? itemsLen + 2 : itemsLen, 
 
                 $itemsWrap = me.$itemsWrap,
@@ -211,6 +213,15 @@ export default {
             me.$items = $items;
             me.itemsLen = itemsLen;
             me.slideCount = slideCount;
+
+            if(hasLoop) {
+                var firstNode = $items[0],
+                    lastNode = $items[itemsLen - 1];
+                appendNode($itemsWrap, firstNode);
+                prependNode($itemsWrap, lastNode);
+                $items = findChildren($itemsWrap, '.v-carousel-item');
+            }
+
 
             doCSS($itemsWrap, 'width', 100 * slideCount + '%');
             each($items, function(element){

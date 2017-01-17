@@ -70,6 +70,24 @@ function attr(element, name) {
 	return element.getAttribute(name);
 }
 
+function append(element, target) {
+	element.appendChild(target);
+}
+
+function prepend(element, target) {
+	var childNodes = children(element);
+	if(childNodes.length > 0) {
+		element.insertBefore(target, childNodes[0]);
+	}
+	else {
+		append(element, target);
+	}
+}
+
+function children(element) {
+	return element.childNodes;
+}
+
 function camelize(str) { 
 	return str.replace(/-+(.)?/g, function(match, chr){ 
 		return chr ? chr.toUpperCase() : '' 
@@ -132,6 +150,9 @@ var $ = {
 	type,
 	isArr,
 	isStr,
+	append,
+	prepend,
+	children,
 	attr,
 	css,
 	each,

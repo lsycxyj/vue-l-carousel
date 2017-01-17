@@ -6,7 +6,7 @@
 <template>
     <div id="app">
         <h3>Vue Carousel Example</h3>
-        <carousel :auto="auto" :watchItems="list" :dots="true">
+        <carousel :auto="auto" :watchItems="list" :dots="true" :loop="true">
             <carousel-item v-for="(item, index) in list">
                 <p>CarouselItem{{index}}, URL is {{item.url}}</p>
             </carousel-item>
