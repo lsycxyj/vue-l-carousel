@@ -1,10 +1,13 @@
 <style lang="less">
+.v-carousel-item {
+    height: 100px;
+}
 </style>
 <template>
     <div id="app">
         <h3>Vue Carousel Example</h3>
-        <carousel :auto="auto" :watchItems="list">
-            <carousel-item v-for="(item, index) in list" @click="log(index)">
+        <carousel :auto="auto" :watchItems="list" :dots="true">
+            <carousel-item v-for="(item, index) in list">
                 <p>CarouselItem{{index}}, URL is {{item.url}}</p>
             </carousel-item>
         </carousel>

@@ -262,7 +262,7 @@ export default {
         rmAnim: function() {
             var me = this;
             //reset reset animation
-            me.transtion = 'none';
+            me.transition = 'none';
             me.animPaused = true;
         },
         addAnim: function() {
@@ -392,7 +392,6 @@ export default {
             }
         },
         transTo(moveTo) {
-            console.log(moveTo)
             this.transform = `translate3d(${moveTo}%,0,0)`;
         },
         startCB(e) {
@@ -402,9 +401,8 @@ export default {
                 getEventData = me.getEv,
                 removeAnimation = me.rmAnim,
                 addAnimation = me.addAnim,
+                transTo = me.transTo,
                 getPercent = me.getPercent,
-                slideCount = me.slideCount,
-                snapback = me.snapback,
 
                 data = getEventData(e),
                 
@@ -422,6 +420,8 @@ export default {
                 $itemsWrap = me.$itemsWrap,
                 elWidth = getWidth($el),
                 currentPos = getCurrentPos($itemsWrap);
+
+            removeAnimation();
 
             function getCurrentPos($itemsWrap) {
                 return getAttr($itemsWrap, 'style') != undefined ? getPercent($itemsWrap) : 0;
@@ -444,30 +444,32 @@ export default {
                     return;
                 }
 
+
                 // prevent scrolling
                 if (deltaX >= 3) {
                     start.interacting = true;
-                    var percent = currentPos + (((stop.coords - start.coords[0]) / elWidth) * 100 / slideCount);
-                    me.transform = `translate3d("${percent}%,0,0")`;
+                    var percent = currentPos + (((stop.coords[0] - start.coords[0]) / elWidth) * 100 / me.slideCount);
+                    transTo(percent);
                     e.preventDefault();
                 }               
             }
 
             function snapback($itemsWrap, left) {
                 var currentPos = getCurrentPos($itemsWrap),
-                    left = ((!left && currentPos < 0) ? roundDown(currentPos) - 100 : roundDown(currentPos)) / slideCount;
+                    left = ((!left && currentPos < 0) ? roundDown(currentPos) - 100 : roundDown(currentPos)) / me.slideCount;
+                transTo(left);
             }
 
             function dragsnap(dir){
                 me.nextPrev(dir);
             }
-            
+
             bindEvent($itemsWrap, EV_MOVE, moveHandler);
             oneEvent($itemsWrap, EV_END, function(e) {
                 var activeIndex = me.activeIndex;
                 unbindEvent($itemsWrap, EV_MOVE, moveHandler);
 
-                removeAnimation();
+                addAnimation();
 
                 if(start && stop) {
                     var deltaX = Math.abs(start.coords[0] - stop.coords[0]),
@@ -488,8 +490,8 @@ export default {
 
                     jumppoint = elWidth / 4;
 
-                    if(deltaX > jumppoint && (!left && activeIndex > 0 || left && activeIndex < me.itemsLen - 1)) {
-                        dragsnap(left ? DIR_PREV : DIR_NEXT);
+                    if(deltaX > jumppoint && me.hasLoop || (!left && activeIndex >= 0 || left && activeIndex <= me.itemsLen - 1)) {
+                        dragsnap(left ? DIR_NEXT : DIR_PREV);
                     }
                     else {
                         snapback($itemsWrap, left)

@@ -8,7 +8,7 @@
 </style>
 
 <template>
-	<div class="v-carousel-item">
+	<div @click="console.log(this)" class="v-carousel-item">
 		<slot></slot>
 	</div>
 </template>
@@ -16,8 +16,7 @@
 <script>
 export default{
 	data() {
-		return {
-		}
+		return {};
 	}
 }
 </script>
