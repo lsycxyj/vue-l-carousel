@@ -104,6 +104,7 @@ var $ = util.$,
     oneEvent = $.one,
     appendNode = $.append,
     prependNode = $.prepend,
+    cloneNode = $.clone,
     getAttr = $.attr,
     doCSS = $.css,
     getWidth = $.width,
@@ -207,14 +208,14 @@ export default {
                 slideCount = hasLoop ? itemsLen + 2 : itemsLen, 
 
                 $itemsWrap = me.$itemsWrap,
-                $items = findChildren($itemsWrap, '.v-carousel-item');
+                $items = findNodes($itemsWrap, '.v-carousel-item');
 
             if(hasLoop) {
                 var firstNode = $items[0],
                     lastNode = $items[itemsLen - 1];
-                appendNode($itemsWrap, firstNode);
-                prependNode($itemsWrap, lastNode);
-                $items = findChildren($itemsWrap, '.v-carousel-item');
+                appendNode($itemsWrap, cloneNode(firstNode, true));
+                prependNode($itemsWrap, cloneNode(lastNode, true));
+                $items = findNodes($itemsWrap, '.v-carousel-item');
             }
 
             me.hasLoop = hasLoop;

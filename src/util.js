@@ -84,6 +84,10 @@ function prepend(element, target) {
 	}
 }
 
+function clone(element, deep) {
+	return element.cloneNode(deep);
+}
+
 function children(element) {
 	return element.childNodes;
 }
@@ -152,6 +156,7 @@ var $ = {
 	isStr,
 	append,
 	prepend,
+	clone,
 	children,
 	attr,
 	css,
