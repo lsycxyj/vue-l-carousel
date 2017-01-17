@@ -59,8 +59,8 @@
         <div class="v-carousel-dots" v-if="dots">
             <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-fclick="{cb:function(){to(index)}}" v-for="(item, index) in watchItems"></div>
         </div>
-        <div class="v-carousel-nav prev" v-fclick="{cb:prev}" v-html="prevHTML"></div>
-        <div class="v-carousel-nav next" v-fclick="{cb:next}" v-html="nextHTML"></div>
+        <div class="v-carousel-nav prev" v-fclick="{cb:prev}" v-show="hasLoop || (itemsLen > 1 && activeIndex > 0)" v-html="prevHTML"></div>
+        <div class="v-carousel-nav next" v-fclick="{cb:next}" v-show="hasLoop || (itemsLen > 1 && activeIndex < itemsLen - 1)" v-html="nextHTML"></div>
         <slot name="after"></slot>
     </div>
 </template>
@@ -77,21 +77,8 @@ const win = window,
     DIR_PREV = 'prev',
     DIR_NEXT = 'next',
 
-    
-    EV_TRANSITION_END = function(){
-        var TRANSITION_ENDS = ['transitionend','OTransitionEnd','webkitTransitionEnd'],
-            i = 0, 
-            len = TRANSITION_ENDS.length, 
-            item,
-            el = doc.createElement('div'),
-            elStyle = el.style;
-        for(; i < len; i++){
-            item = TRANSITION_ENDS[i];
-            if(elStyle[item]){
-                return item;
-            }
-        }
-    }(),
+    //unable to detect the exact event
+    EV_TRANSITION_END = ['transitionend','OTransitionEnd','webkitTransitionEnd'],
 
     EV_TOUCH_START = 'touchstart',
     EV_TOUCH_END = 'touchend',
@@ -170,7 +157,7 @@ export default {
             slideCount: 0,
             hasLoop: false,
             autoTimer: null,
-            $items: null，
+            $items: null,
             $itemsWrap: null,
             transEndCB: null
         };
@@ -198,17 +185,14 @@ export default {
         bindEvent(win, EV_RESIZE, adjRound);
         //DragSnap support
         bindEvent($itemsWrap, EV_START, me.startCB);
-        bindEvent($itemsWrap, EV_TRANSITION_END, function(){
-            var transEndCB = me.transEndCB;
-            if(transEndCB){
-                transEndCB();
-            }
-        });
+        bindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
     },
     //Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
     destroyed() {
+        var me = this;
         unbindEvent(win, EV_RESIZE, me.adjRound);
         unbindEvent(win, EV_START, me.startCB);
+        unbindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
     },
     methods: {
         updateRender() {
@@ -398,7 +382,17 @@ export default {
             me.transEndCB = onSlideEnd;
             me.transTo(left);
         },
+        checkTrans(){
+            var me = this,
+                transEndCB = me.transEndCB;
+            //only fire once
+            if(transEndCB){
+                transEndCB();
+                me.transEndCB = null;
+            }
+        },
         transTo(moveTo) {
+            console.log(moveTo)
             this.transform = `translate3d(${moveTo}%,0,0)`;
         },
         startCB(e) {

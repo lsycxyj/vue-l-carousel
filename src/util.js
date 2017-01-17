@@ -25,11 +25,25 @@ function qsa(element, selector) {
 }
 
 function on(element, ev, callback) {
-	element.addEventListener(ev, callback);
+	if(isStr(ev)) {
+		element.addEventListener(ev, callback);
+	}
+	else if(isArr(ev)) {
+		each(ev, function(e) {
+			on(element, e, callback);
+		});
+	}
 }
 
 function off(element, ev, callback) {
-	element.removeEventListener(ev, callback);
+	if(isStr(ev)) {
+		element.removeEventListener(ev, callback);
+	}
+	else if(isArr(ev)) {
+		each(ev, function(e) {
+			on(element, e, callback);
+		});
+	}
 }
 
 function one(element, ev, callback) {
@@ -38,6 +52,18 @@ function one(element, ev, callback) {
 		off(element, ev, handler);
 	}
 	on(element, ev, handler);
+}
+
+function type(o) {
+	return typeof o;
+}
+
+function isArr(o) {
+	return o instanceof Array;
+}
+
+function isStr(o) {
+	return type(o) == 'string';
 }
 
 function attr(element, name) {
@@ -103,6 +129,9 @@ var $ = {
 	on,
 	off,
 	one,
+	type,
+	isArr,
+	isStr,
 	attr,
 	css,
 	each,
