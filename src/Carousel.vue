@@ -209,11 +209,6 @@ export default {
                 $itemsWrap = me.$itemsWrap,
                 $items = findChildren($itemsWrap, '.v-carousel-item');
 
-            me.hasLoop = hasLoop;
-            me.$items = $items;
-            me.itemsLen = itemsLen;
-            me.slideCount = slideCount;
-
             if(hasLoop) {
                 var firstNode = $items[0],
                     lastNode = $items[itemsLen - 1];
@@ -222,6 +217,9 @@ export default {
                 $items = findChildren($itemsWrap, '.v-carousel-item');
             }
 
+            me.hasLoop = hasLoop;
+            me.itemsLen = itemsLen;
+            me.slideCount = slideCount;
 
             doCSS($itemsWrap, 'width', 100 * slideCount + '%');
             each($items, function(element){
