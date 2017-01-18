@@ -280,7 +280,7 @@ export default {
         addAnim: function() {
             var me = this,
                 $itemsWrap = me.$itemsWrap;
-            //Force paint
+            //Force to paint
             getOffset($itemsWrap);
 
             doCSS($itemsWrap, PROP_TRANSITION, PROP_TRANSFORM + ' ' + (me.speed / 1000) + 's ease');
