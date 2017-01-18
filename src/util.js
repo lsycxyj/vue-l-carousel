@@ -120,7 +120,7 @@ function css(element, property, value) {
 			elementSytle.removeProperty(dasherize(key));
 		}
 		else {
-			elementSytle.cssText += dasherize(property) + ':' + maybeAddPx(property, value);
+			elementSytle[dasherize(property)] = maybeAddPx(property, value);
 		}
 	}
 }

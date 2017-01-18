@@ -6,7 +6,7 @@
 <template>
     <div id="app">
         <h3>Vue Carousel Example</h3>
-        <carousel :auto="auto" :watchItems="list" :dots="true" :loop="true">
+        <carousel :auto="auto" :watchItems="list" :dots="true" :loop="true" :speed="speed">
             <carousel-item v-for="(item, index) in list">
                 <p>CarouselItem{{index}}, URL is {{item.url}}</p>
             </carousel-item>
@@ -51,7 +51,8 @@ export default {
     data() {
         return {
             auto: 0,
-            list: list1
+            list: list1,
+            speed: 5000
         };
     },
     methods: {

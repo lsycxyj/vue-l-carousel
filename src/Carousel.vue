@@ -53,7 +53,7 @@
     -->
     <div class="v-carousel">
         <slot name="before"></slot>
-        <div class="v-carousel-items" :style="{'transition': transition, 'transform': transform}">
+        <div class="v-carousel-items">
             <slot></slot>
         </div>
         <div class="v-carousel-dots" v-if="dots">
@@ -72,6 +72,13 @@ import util from './util';
 const win = window,
     doc = document,
     navigator = win.navigator,
+    ua = win.navigator.userAgent || win.navigator.appVersion,
+    vendor = (/webkit/i).test(ua) ? 'webkit' : (/firefox/i).test(ua) ? 'moz' : 'opera' in win ? 'o'  : '',
+    cssVendor = vendor ? '-' + vendor.toLowerCase() + '-' : '', //css前缀兼容
+
+    PROP_TRANSITION = cssVendor + 'transition',
+    PROP_TRANSFORM = cssVendor + 'transform',
+
     hasTouch = !!('ontouchstart' in win || navigator.maxTouchPoints),
 
     DIR_PREV = 'prev',
@@ -153,9 +160,7 @@ export default {
     data() {
         return {
             activeIndex: 0,
-            transition: 'none',
             animPaused: true,
-            transform: '',
             itemsLen: 0,
             slideCount: 0,
             hasLoop: false,
@@ -221,6 +226,7 @@ export default {
             me.hasLoop = hasLoop;
             me.itemsLen = itemsLen;
             me.slideCount = slideCount;
+            me.$items = $items;
 
             doCSS($itemsWrap, 'width', 100 * slideCount + '%');
             each($items, function(element){
@@ -229,15 +235,9 @@ export default {
 
             me.rmAnim();
             me.adjRound();
-
-            me.$nextTick(function() {
-                me.reset();
-
-                me.addAnim();
-
-                me.checkAuto();
-            });
-
+            me.reset();
+            me.addAnim();
+            me.checkAuto();
         },
         reset() {
             var me = this;
@@ -270,15 +270,19 @@ export default {
             }
         },
         rmAnim: function() {
-            var me = this;
+            var me = this,
+                $itemsWrap = me.$itemsWrap;
             //reset reset animation
-            me.transition = 'none';
+            doCSS($itemsWrap, PROP_TRANSITION, 'none');
             me.animPaused = true;
+            console.log('remove anim')
         },
         addAnim: function() {
-            var me = this;
-            me.transition = 'transform ' + (me.speed / 1000) + 's ease';
+            var me = this,
+                $itemsWrap = me.$itemsWrap;
+            doCSS($itemsWrap, PROP_TRANSITION, PROP_TRANSFORM + ' ' + (me.speed / 1000) + 's ease');
             me.animPaused = false;
+            console.log('add anim')
         },
         on() {
             var me = this;
@@ -346,7 +350,7 @@ export default {
                 addAnimation = me.addAnim,
                 go = me.to,
 
-                onSlideEnd,
+                onSlideEnd = null,
                 realIndex,
                 left;
                 
@@ -354,19 +358,15 @@ export default {
                 if(index == -1){
                     onSlideEnd = function() {
                         removeAnimation();
-                        me.$nextTick(function(){
-                            go(itemsLen - 1);
-                            addAnimation();
-                        });
+                        go(itemsLen - 1);
+                        addAnimation();
                     };
                 }
                 else if(index == itemsLen){
                     onSlideEnd = function() {
                         removeAnimation();
-                        me.$nextTick(function(){
-                            go(1);
-                            addAnimation();
-                        });
+                        go(1);
+                        addAnimation();
                     };
                 }
 
@@ -379,6 +379,8 @@ export default {
             left = realIndex * -100 / slideCount;
 
             if(!onSlideEnd) {
+                console.log(getAttr(me.$itemsWrap, 'style'));
+                console.log(index)
                 if(me.animPaused) {
                     me.activeIndex = index;
                 }
@@ -402,7 +404,7 @@ export default {
             }
         },
         transTo(moveTo) {
-            this.transform = `translate3d(${moveTo}%,0,0)`;
+            doCSS(this.$itemsWrap, PROP_TRANSFORM, `translate3d(${moveTo}%,0,0)`);
         },
         startCB(e) {
             var me = this,
