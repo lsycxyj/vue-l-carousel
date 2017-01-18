@@ -117,7 +117,7 @@ function css(element, property, value) {
 	}
 	else {
 		if(!value && value !== 0) {
-			elementSytle.removeProperty(dasherize(key));
+			elementSytle.removeProperty(dasherize(property));
 		}
 		else {
 			elementSytle[dasherize(property)] = maybeAddPx(property, value);

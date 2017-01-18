@@ -115,6 +115,7 @@ var $ = util.$,
     getAttr = $.attr,
     doCSS = $.css,
     getWidth = $.width,
+    getOffset = $.offset,
     each = $.each;
 
 //TODO speed up
@@ -275,14 +276,15 @@ export default {
             //reset reset animation
             doCSS($itemsWrap, PROP_TRANSITION, 'none');
             me.animPaused = true;
-            console.log('remove anim')
         },
         addAnim: function() {
             var me = this,
                 $itemsWrap = me.$itemsWrap;
+            //Force paint
+            getOffset($itemsWrap);
+
             doCSS($itemsWrap, PROP_TRANSITION, PROP_TRANSFORM + ' ' + (me.speed / 1000) + 's ease');
             me.animPaused = false;
-            console.log('add anim')
         },
         on() {
             var me = this;
@@ -379,8 +381,6 @@ export default {
             left = realIndex * -100 / slideCount;
 
             if(!onSlideEnd) {
-                console.log(getAttr(me.$itemsWrap, 'style'));
-                console.log(index)
                 if(me.animPaused) {
                     me.activeIndex = index;
                 }
