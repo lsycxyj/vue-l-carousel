@@ -88,6 +88,17 @@ function clone(element, deep) {
 	return element.cloneNode(deep);
 }
 
+function addClass(element, className) {
+	element.classList.add(className);
+}
+
+function remove(element) {
+	var $parent = element.parentNode;
+	if($parent){
+		$parent.removeChild(element);
+	}
+}
+
 function children(element) {
 	return element.childNodes;
 }
@@ -157,6 +168,8 @@ var $ = {
 	append,
 	prepend,
 	clone,
+	addClass,
+	remove,
 	children,
 	attr,
 	css,

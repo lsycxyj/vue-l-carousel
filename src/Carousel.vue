@@ -112,6 +112,8 @@ var $ = util.$,
     appendNode = $.append,
     prependNode = $.prepend,
     cloneNode = $.clone,
+    removeNode = $.remove,
+    addClass = $.addClass,
     getAttr = $.attr,
     doCSS = $.css,
     getWidth = $.width,
@@ -160,14 +162,18 @@ export default {
     },
     data() {
         return {
+            //It seems that key with symbols can't be accessced directly from vm.
             activeIndex: 0,
             animPaused: true,
             itemsLen: 0,
             slideCount: 0,
             hasLoop: false,
             autoTimer: null,
-            $items: null,
-            $itemsWrap: null,
+            //Nodes
+            cloneItems: [],
+            items: null,
+            itemsWrap: null,
+            //Callbacks
             transEndCB: null
         };
     },
@@ -183,7 +189,7 @@ export default {
             updateRender = me.updateRender,
             adjRound = me.adjRound;
 
-        me.$itemsWrap = $itemsWrap;
+        me.itemsWrap = $itemsWrap;
 
         me.$watch('watchItems', updateRender);
         me.$watch('auto', me.checkAuto);
@@ -213,21 +219,41 @@ export default {
                 hasLoop = loop && itemsLen > 1,
                 slideCount = hasLoop ? itemsLen + 2 : itemsLen, 
 
-                $itemsWrap = me.$itemsWrap,
-                $items = findNodes($itemsWrap, '.v-carousel-item');
+                $itemsWrap = me.itemsWrap,
+                $cloneItems = me.cloneItems;
+
+            //clean up
+            if($cloneItems.length > 0){
+                each($cloneItems, function($item){
+                    removeNode($item);
+                });
+                $cloneItems = [];
+                me.cloneItems = $cloneItems;
+            }
+
+            var $items = findNodes($itemsWrap, '.v-carousel-item');
 
             if(hasLoop) {
                 var firstNode = $items[0],
-                    lastNode = $items[itemsLen - 1];
-                appendNode($itemsWrap, cloneNode(firstNode, true));
-                prependNode($itemsWrap, cloneNode(lastNode, true));
+                    lastNode = $items[itemsLen - 1],
+                    firstNodeCloned = cloneNode(firstNode, true),
+                    lastNodeCloned = cloneNode(lastNode, true);
+                appendNode($itemsWrap, firstNodeCloned);
+                prependNode($itemsWrap, lastNodeCloned);
+
+                $cloneItems.push(firstNodeCloned);
+                $cloneItems.push(lastNodeCloned);
+                each($cloneItems, function($item){
+                    addClass($item, 'cloned');
+                });
+
                 $items = findNodes($itemsWrap, '.v-carousel-item');
             }
 
             me.hasLoop = hasLoop;
             me.itemsLen = itemsLen;
             me.slideCount = slideCount;
-            me.$items = $items;
+            me.items = $items;
 
             doCSS($itemsWrap, 'width', 100 * slideCount + '%');
             each($items, function(element){
@@ -252,7 +278,7 @@ export default {
                 turnOff = me.off,
                 turnOn = me.on,
 
-                $itemsWrap = me.$itemsWrap;
+                $itemsWrap = me.itemsWrap;
 
             unbindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
             unbindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
@@ -272,14 +298,14 @@ export default {
         },
         rmAnim: function() {
             var me = this,
-                $itemsWrap = me.$itemsWrap;
+                $itemsWrap = me.itemsWrap;
             //reset reset animation
             doCSS($itemsWrap, PROP_TRANSITION, 'none');
             me.animPaused = true;
         },
         addAnim: function() {
             var me = this,
-                $itemsWrap = me.$itemsWrap;
+                $itemsWrap = me.itemsWrap;
             //Force to paint
             getOffset($itemsWrap);
 
@@ -404,7 +430,7 @@ export default {
             }
         },
         transTo(moveTo) {
-            doCSS(this.$itemsWrap, PROP_TRANSFORM, `translate3d(${moveTo}%,0,0)`);
+            doCSS(this.itemsWrap, PROP_TRANSFORM, `translate3d(${moveTo}%,0,0)`);
         },
         startCB(e) {
             var me = this,
@@ -429,7 +455,7 @@ export default {
                 },
                 stop, deltaX, deltaY,
 
-                $itemsWrap = me.$itemsWrap,
+                $itemsWrap = me.itemsWrap,
                 elWidth = getWidth($el),
                 currentPos = getCurrentPos($itemsWrap);
 
@@ -530,7 +556,7 @@ export default {
         adjRound() {
             var me = this,
                 $el = me.$el,
-                $items = me.$items,
+                $items = me.items,
                 diff = getWidth($el) - getWidth($items[0]);
 
             if(diff !== 0) {
