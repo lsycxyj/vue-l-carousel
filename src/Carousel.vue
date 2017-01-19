@@ -144,6 +144,14 @@ export default {
             type: Boolean,
             default: false
         },
+        rewind: {
+            type: Boolean,
+            default: true
+        },
+        mouseDrag: {
+            type: Boolean,
+            default: false
+        },
         //0 for no autoplay
         auto: {
             type: Number,
@@ -187,26 +195,28 @@ export default {
             $itemsWrap = findNodes($el, '.v-carousel-items')[0],
             
             updateRender = me.updateRender,
+            checkDrag = me.checkDrag,
             adjRound = me.adjRound;
 
         me.itemsWrap = $itemsWrap;
 
         me.$watch('watchItems', updateRender);
+        me.$watch('mouseDrag', checkDrag);
         me.$watch('auto', me.checkAuto);
 
+        checkDrag();
         updateRender();
         adjRound();
 
         bindEvent(win, EV_RESIZE, adjRound);
-        //DragSnap support
-        bindEvent($itemsWrap, EV_START, me.startCB);
         bindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
     },
     //Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
     destroyed() {
-        var me = this;
+        var me = this,
+            $itemsWrap = me.itemsWrap;
         unbindEvent(win, EV_RESIZE, me.adjRound);
-        unbindEvent(win, EV_START, me.startCB);
+        me.unbindDrag();
         unbindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
     },
     methods: {
@@ -270,6 +280,19 @@ export default {
             var me = this;
             me.off();
             me.to(0);
+        },
+        checkDrag() {
+            var me = this,
+                mouseDrag = me.mouseDrag;
+            me.unbindDrag();
+            if(hasTouch || mouseDrag){
+                //DragSnap support
+                bindEvent(me.itemsWrap, EV_START, me.startCB);
+            }
+        },
+        unbindDrag() {
+            var me = this;
+            unbindEvent(me.itemsWrap, EV_START, me.startCB);
         },
         checkAuto() {
             var me = this,
