@@ -594,7 +594,7 @@ export default {
 
                     jumppoint = elWidth / 4;
 
-                    if(deltaX > jumppoint && (me.hasLoop && !me.rewind || (!left && activeIndex >= 0 || left && activeIndex <= me.itemsLen - 1))) {
+                    if(deltaX > jumppoint && (me.hasLoop && !me.rewind || (!left && activeIndex > 0 || left && activeIndex < me.itemsLen - 1))) {
                         dragsnap(left ? DIR_NEXT : DIR_PREV);
                     }
                     else {
