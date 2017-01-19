@@ -72,9 +72,9 @@ import util from './util';
 const win = window,
     doc = document,
     navigator = win.navigator,
-    ua = win.navigator.userAgent || win.navigator.appVersion,
+    ua = navigator.userAgent || navigator.appVersion,
     vendor = (/webkit/i).test(ua) ? 'webkit' : (/firefox/i).test(ua) ? 'moz' : 'opera' in win ? 'o'  : '',
-    cssVendor = vendor ? '-' + vendor.toLowerCase() + '-' : '', //css前缀兼容
+    cssVendor = vendor ? '-' + vendor.toLowerCase() + '-' : '', 
 
     PROP_TRANSITION = cssVendor + 'transition',
     PROP_TRANSFORM = cssVendor + 'transform',
@@ -128,39 +128,47 @@ function roundDown(oVal) {
 
 export default {
     props: {
+        //HTML content of the previous button.
         prevHTML: {
             type: String,
             default: '&lt;'
         },
+        //HTML content of the enext button.
         nextHTML: {
             type: String,
             default: '&gt;'
         },
+        //The time of the transition animation. In ms.
         speed: {
             type: Number,
             default: 300
         },
+        //It can go to next/previous slide at the ends if it's set to true. It works only the items' length more than 1.
         loop: {
             type: Boolean,
             default: false
         },
+        //Rewind to the other end instead of endless loop but you can only go to the other end by previous or next button, if it's set to true. It works only loop is set to true.
         rewind: {
             type: Boolean,
-            default: true
+            default: false
         },
+        //It can be drag by mouse if it's set to true.
         mouseDrag: {
             type: Boolean,
             default: false
         },
-        //0 for no autoplay
+        //Autoplay interval. In ms. 0 for no autoplay.
         auto: {
             type: Number,
             default: 0
         },
+        //Pagination is available if it's set to true.
         dots: {
             type: Boolean,
             default: true
         },
+        //The original data list used to render the CarouselItems. The component will rerender if this property changes.
         watchItems: {
             type: Array,
             default() {
@@ -226,6 +234,7 @@ export default {
                 loop = me.loop,
                 watchItems = me.watchItems,
                 itemsLen = watchItems.length,
+                rewind = me.rewind,
                 hasLoop = loop && itemsLen > 1,
                 slideCount = hasLoop ? itemsLen + 2 : itemsLen, 
 
@@ -243,7 +252,8 @@ export default {
 
             var $items = findNodes($itemsWrap, '.v-carousel-item');
 
-            if(hasLoop) {
+            //create cloned nodes
+            if(hasLoop && !rewind) {
                 var firstNode = $items[0],
                     lastNode = $items[itemsLen - 1],
                     firstNodeCloned = cloneNode(firstNode, true),
@@ -358,17 +368,24 @@ export default {
         nextPrev(dir) {
             var me = this,
                 hasLoop = me.hasLoop,
+                rewind = me.rewind,
                 itemsLen = me.itemsLen,
+                lastItemIndex = itemsLen - 1,
                 activeIndex = me.activeIndex,
                 index;
 
             if(dir == DIR_PREV) {
                 if(activeIndex == 0){
                     if(hasLoop) {
-                        index = -1;
+                        if(rewind) {
+                            index = lastItemIndex;
+                        }
+                        else {
+                            index = -1;
+                        }
                     }
                     else {
-                        index = 0;
+                        return;
                     }
                 }
                 else {
@@ -379,10 +396,15 @@ export default {
             else {
                 if(activeIndex == itemsLen - 1){
                     if(hasLoop) {
-                        index = itemsLen;
+                        if(rewind) {
+                            index = 0
+                        }
+                        else {
+                            index = itemsLen;
+                        }
                     }
                     else {
-                        index = itemsLen - 1;
+                        return;
                     }
                 }
                 else {
@@ -409,7 +431,7 @@ export default {
                 if(index == -1){
                     onSlideEnd = function() {
                         removeAnimation();
-                        go(itemsLen - 1);
+                        go(lastItemIndex);
                         addAnimation();
                     };
                 }
@@ -551,7 +573,7 @@ export default {
 
                     jumppoint = elWidth / 4;
 
-                    if(deltaX > jumppoint && me.hasLoop || (!left && activeIndex >= 0 || left && activeIndex <= me.itemsLen - 1)) {
+                    if(deltaX > jumppoint && (me.hasLoop && !me.rewind || (!left && activeIndex >= 0 || left && activeIndex <= me.itemsLen - 1))) {
                         dragsnap(left ? DIR_NEXT : DIR_PREV);
                     }
                     else {
