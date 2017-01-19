@@ -208,9 +208,15 @@ export default {
 
         me.itemsWrap = $itemsWrap;
 
-        me.$watch('watchItems', updateRender);
-        me.$watch('mouseDrag', checkDrag);
-        me.$watch('auto', me.checkAuto);
+        function watch(k, v){
+            me.$watch(k, v);
+        }
+
+        watch('watchItems', updateRender);
+        watch('loop', updateRender);
+        watch('rewind', updateRender);
+        watch('mouseDrag', checkDrag);
+        watch('auto', me.checkAuto);
 
         checkDrag();
         updateRender();
@@ -346,11 +352,25 @@ export default {
             me.animPaused = false;
         },
         on() {
-            var me = this;
+            var me = this,
+                hasLoop = me.hasLoop,
+                itemsLen = me.itemsLen;
             me.off();
-            me.autoTimer = setInterval(function(){
-                me.next();
-            }, me.auto);
+            if(itemsLen.length > 1){
+                me.autoTimer = setInterval(function(){
+                    if(!hasLoop){
+                        if(me.activeIndex == itemsLen - 1){
+                            me.to(0);
+                        }
+                        else {
+                            me.next();
+                        }
+                    }
+                    else {
+                        me.next();
+                    }
+                }, me.auto);
+            }
         },
         off() {
             var me = this;
@@ -418,6 +438,7 @@ export default {
                 hasLoop = me.hasLoop,
                 itemsLen = me.itemsLen,
                 slideCount = me.slideCount,
+                lastItemIndex = itemsLen - 1,
 
                 removeAnimation = me.rmAnim,
                 addAnimation = me.addAnim,
@@ -438,7 +459,7 @@ export default {
                 else if(index == itemsLen){
                     onSlideEnd = function() {
                         removeAnimation();
-                        go(1);
+                        go(0);
                         addAnimation();
                     };
                 }
