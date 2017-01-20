@@ -120,10 +120,17 @@ var $ = util.$,
     getOffset = $.offset,
     each = $.each;
 
-//TODO speed up
+function roundUp(oVal) {
+    return round(oVal, Math.ceil);
+}
+
 function roundDown(oVal) {
+    return round(oVal, Math.floor);
+}
+
+function round(oVal, method) {
     var val = parseInt(oVal, 10);
-    return Math.ceil((val - (val % 100)) / 100) * 100;
+    return method(oVal / 100) * 100;
 }
 
 export default {
@@ -324,7 +331,7 @@ export default {
             unbindEvent($itemsWrap, EV_START, turnOff);
             unbindEvent($itemsWrap, EV_END, turnOn);
 
-            if(auto) {
+            if(auto > 0) {
                 bindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
                 bindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
                 bindEvent($itemsWrap, EV_START, turnOff);
@@ -559,8 +566,10 @@ export default {
             }
 
             function snapback($itemsWrap, left) {
-                var currentPos = getCurrentPos($itemsWrap),
-                    left = ((!left && currentPos < 0) ? roundDown(currentPos) - 100 : roundDown(currentPos)) / me.slideCount;
+                var slideCount = me.slideCount,
+                    currentPos = getCurrentPos($itemsWrap) * slideCount,
+                    left = (left ? roundUp(currentPos) : roundDown(currentPos)) / slideCount;
+
                 transTo(left);
             }
 
@@ -594,7 +603,7 @@ export default {
 
                     jumppoint = elWidth / 4;
 
-                    if(deltaX > jumppoint && (me.hasLoop && !me.rewind || (!left && activeIndex > 0 || left && activeIndex < me.itemsLen - 1))) {
+                    if(deltaX > jumppoint && (me.hasLoop && !me.rewind || !left && activeIndex > 0 || left && activeIndex < me.itemsLen - 1)) {
                         dragsnap(left ? DIR_NEXT : DIR_PREV);
                     }
                     else {
