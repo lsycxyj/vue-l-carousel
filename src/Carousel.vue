@@ -56,7 +56,7 @@
         <div class="v-carousel-items">
             <slot></slot>
         </div>
-        <div class="v-carousel-dots" v-if="dots">
+        <div class="v-carousel-dots" :style="dotsStyle" v-if="dots">
             <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-fclick="{cb:function(){to(index)}}" v-for="(item, index) in watchItems"></div>
         </div>
         <div class="v-carousel-nav prev" v-fclick="{cb:prev}" v-show="hasLoop || (itemsLen > 1 && activeIndex > 0)" v-html="prevHTML"></div>
@@ -99,6 +99,9 @@ const win = window,
     EV_MOUSE_MOVE = 'mousemove',
 
     EV_RESIZE = 'resize',
+
+    EV_PREFIX = 'v-carousel',
+    EV_CHANGED_INDEX = `${EV_PREFIX}.changed.index`,
     
     EV_START = hasTouch ? EV_TOUCH_START : EV_MOUSE_DOWN,
     EV_MOVE = hasTouch ? EV_TOUCH_MOVE : EV_MOUSE_MOVE,
@@ -175,6 +178,11 @@ export default {
             type: Boolean,
             default: true
         },
+        //Style of v-carousel-dots
+        dotsStyle: {
+            type: [Object, String, Array],
+            default: ''
+        },
         //The original data list used to render the CarouselItems. The component will rerender if this property changes.
         watchItems: {
             type: Array,
@@ -219,11 +227,21 @@ export default {
             me.$watch(k, v);
         }
 
+        function emit(e, v){
+            me.$emit(e, v);
+        }
+
         watch('watchItems', updateRender);
         watch('loop', updateRender);
         watch('rewind', updateRender);
         watch('mouseDrag', checkDrag);
         watch('auto', me.checkAuto);
+        watch('activeIndex', function(){
+            emit(EV_CHANGED_INDEX, {
+                index: me.activeIndex,
+                total: me.itemsLen
+            });
+        });
 
         checkDrag();
         updateRender();

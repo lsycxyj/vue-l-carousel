@@ -60,6 +60,12 @@ export default {
             loop: true
         };
     },
+    mounted() {
+        var me = this;
+        me.$on('v-carousel.changed.index', function(){
+            console.log(arguments);
+        });
+    },
     methods: {
         toggleAuto() {
             this.auto = this.auto === 0 ? 3000 : 0;
