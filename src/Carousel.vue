@@ -231,17 +231,22 @@ export default {
             me.$emit(e, v);
         }
 
+        function emitChangedIndex() {
+            var index = me.activeIndex;
+            console.log(EV_CHANGED_INDEX)
+            emit(EV_CHANGED_INDEX, {
+                index: index,
+                total: me.itemsLen,
+                item: me.watchItems[index]
+            });
+        }
+
         watch('watchItems', updateRender);
         watch('loop', updateRender);
         watch('rewind', updateRender);
         watch('mouseDrag', checkDrag);
         watch('auto', me.checkAuto);
-        watch('activeIndex', function(){
-            emit(EV_CHANGED_INDEX, {
-                index: me.activeIndex,
-                total: me.itemsLen
-            });
-        });
+        watch('activeIndex', emitChangedIndex);
 
         checkDrag();
         updateRender();
