@@ -100,8 +100,12 @@ const win = window,
 
     EV_RESIZE = 'resize',
 
-    EV_PREFIX = 'v-carousel',
-    EV_CHANGED_INDEX = `${EV_PREFIX}.changed.index`,
+    //Custom events
+    EV_CHANGED_INDEX = 'changed-index',
+    EV_RENDER_UPDATED = 'render-updated',
+    EV_NEXT = 'next',
+    EV_PREV = 'prev',
+    EV_TO = 'to',
     
     EV_START = hasTouch ? EV_TOUCH_START : EV_MOUSE_DOWN,
     EV_MOVE = hasTouch ? EV_TOUCH_MOVE : EV_MOUSE_MOVE,
@@ -217,7 +221,11 @@ export default {
             $el = me.$el,
             $itemsWrap = findNodes($el, '.v-carousel-items')[0],
             
-            updateRender = me.updateRender,
+            updateRender = function(){
+                me.updateRender();
+                emitChangedIndex();
+                emit(EV_RENDER_UPDATED);
+            },
             checkDrag = me.checkDrag,
             adjRound = me.adjRound;
 
@@ -227,13 +235,16 @@ export default {
             me.$watch(k, v);
         }
 
+        function listen(e, cb){
+            me.$on(e, cb);
+        }
+
         function emit(e, v){
             me.$emit(e, v);
         }
 
         function emitChangedIndex() {
             var index = me.activeIndex;
-            console.log(EV_CHANGED_INDEX)
             emit(EV_CHANGED_INDEX, {
                 index: index,
                 total: me.itemsLen,
@@ -247,6 +258,16 @@ export default {
         watch('mouseDrag', checkDrag);
         watch('auto', me.checkAuto);
         watch('activeIndex', emitChangedIndex);
+
+        listen(EV_PREV, me.prev);
+        listen(EV_NEXT, me.next);
+        listen(EV_TO, function(v){
+            var nVal = parseInt(v, 10),
+                itemsLen = me.itemsLen;
+            if(v !== NaN && itemsLen > 0 && nVal >= 0 && nVal < itemsLen) {
+                me.to(nVal);
+            }
+        });
 
         checkDrag();
         updateRender();

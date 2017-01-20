@@ -6,14 +6,24 @@
 <template>
     <div id="app">
         <h3>Vue Carousel Example</h3>
-        <carousel :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed">
+        <carousel ref="car" @changed-index="log" @render-updated="log('render-updated')" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed">
             <carousel-item v-for="(item, index) in list">
                 <p>CarouselItem{{index}}, URL is {{item.url}}</p>
             </carousel-item>
         </carousel>
-        <button @click="toggleAuto()">toggle auto</button>
-        <button @click="toggleLoop()">toggle loop</button>
-        <button @click="changeList()">change list</button>
+        <div>
+            <button @click="toggleAuto()">toggle auto</button>
+            <button @click="toggleLoop()">toggle loop</button>
+            <button @click="changeList()">change list</button>
+        </div>
+        <div>
+            <button @click="$refs.car.$emit('prev')">Prev slide</button>
+            <button @click="$refs.car.$emit('next')">Next slide</button>
+        </div>
+        <div>
+            <label>Goto:</label>
+            <input type="number" @input="to" value="0">
+        </div>
     </div>
 </template>
 <script>
@@ -62,7 +72,7 @@ export default {
     },
     mounted() {
         var me = this;
-        me.$on('v-carousel.changed.index', function(){
+        me.$on('v-carousel', function(){
             console.log(arguments);
         });
     },
@@ -75,6 +85,9 @@ export default {
         },
         log(content) {
             log(content);
+        },
+        to(e) {
+            this.$refs.car.$emit('to', e.target.value);
         },
         indexChanged(index, total, item) {
             var me = this,
