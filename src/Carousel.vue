@@ -67,7 +67,7 @@
 
 <script>
 import VueFclickLite from './VueFclickLite';
-import util from './util';
+import {$} from './util';
 
 const win = window,
     doc = document,
@@ -106,13 +106,20 @@ const win = window,
     EV_NEXT = 'next',
     EV_PREV = 'prev',
     EV_TO = 'to',
+
+    Events = {
+        EV_CHANGED_INDEX,
+        EV_RENDER_UPDATED,
+        EV_NEXT,
+        EV_PREV,
+        EV_TO
+    },
     
     EV_START = hasTouch ? EV_TOUCH_START : EV_MOUSE_DOWN,
     EV_MOVE = hasTouch ? EV_TOUCH_MOVE : EV_MOUSE_MOVE,
     EV_END = hasTouch ? EV_TOUCH_END : EV_MOUSE_UP;
 
-var $ = util.$,
-    findNodes = $.qsa,
+var findNodes = $.qsa,
     bindEvent = $.on,
     unbindEvent = $.off,
     oneEvent = $.one,
@@ -139,6 +146,10 @@ function round(oVal, method) {
     var val = parseInt(oVal, 10);
     return method(oVal / 100) * 100;
 }
+
+export {
+    Events
+};
 
 export default {
     props: {

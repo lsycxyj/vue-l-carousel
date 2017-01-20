@@ -179,6 +179,6 @@ var $ = {
 };
 
 
-export default {
+export {
 	$
 };
