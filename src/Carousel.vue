@@ -57,16 +57,15 @@
             <slot></slot>
         </div>
         <div class="v-carousel-dots" :style="dotsStyle" v-if="dots">
-            <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" v-fclick="{cb:function(){to(index)}}" v-for="(item, index) in watchItems"></div>
+            <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" @click="to(index)" v-for="(item, index) in watchItems"></div>
         </div>
-        <div class="v-carousel-nav prev" v-fclick="{cb:prev}" v-show="hasLoop || (itemsLen > 1 && activeIndex > 0)" v-html="prevHTML"></div>
-        <div class="v-carousel-nav next" v-fclick="{cb:next}" v-show="hasLoop || (itemsLen > 1 && activeIndex < itemsLen - 1)" v-html="nextHTML"></div>
+        <div class="v-carousel-nav prev" @click="prev" v-show="hasLoop || (itemsLen > 1 && activeIndex > 0)" v-html="prevHTML"></div>
+        <div class="v-carousel-nav next" @click="next" v-show="hasLoop || (itemsLen > 1 && activeIndex < itemsLen - 1)" v-html="nextHTML"></div>
         <slot name="after"></slot>
     </div>
 </template>
 
 <script>
-import VueFclickLite from './VueFclickLite';
 import {$} from './util';
 
 const win = window,
@@ -222,9 +221,6 @@ export default {
             //Callbacks
             transEndCB: null
         };
-    },
-    directives: {
-        fclick: VueFclickLite
     },
     mounted() {
         var me = this,
