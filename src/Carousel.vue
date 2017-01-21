@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import {$} from './util';
+import $ from './util';
 
 const win = window,
     doc = document,
@@ -119,7 +119,7 @@ const win = window,
     EV_MOVE = hasTouch ? EV_TOUCH_MOVE : EV_MOUSE_MOVE,
     EV_END = hasTouch ? EV_TOUCH_END : EV_MOUSE_UP;
 
-var findNodes = $.qsa,
+const findNodes = $.qsa,
     bindEvent = $.on,
     unbindEvent = $.off,
     oneEvent = $.one,
@@ -143,7 +143,7 @@ function roundDown(oVal) {
 }
 
 function round(oVal, method) {
-    var val = parseInt(oVal, 10);
+    let val = parseInt(oVal, 10);
     return method(oVal / 100) * 100;
 }
 
@@ -225,7 +225,7 @@ export default {
         };
     },
     mounted() {
-        var me = this,
+        let me = this,
 
             $el = me.$el,
             $itemsWrap = findNodes($el, '.v-carousel-items')[0],
@@ -253,7 +253,7 @@ export default {
         }
 
         function emitChangedIndex() {
-            var index = me.activeIndex;
+            let index = me.activeIndex;
             emit(EV_CHANGED_INDEX, {
                 index: index,
                 total: me.itemsLen,
@@ -271,7 +271,7 @@ export default {
         listen(EV_PREV, me.prev);
         listen(EV_NEXT, me.next);
         listen(EV_TO, function(v){
-            var nVal = parseInt(v, 10),
+            let nVal = parseInt(v, 10),
                 itemsLen = me.itemsLen;
             if(v !== NaN && itemsLen > 0 && nVal >= 0 && nVal < itemsLen) {
                 me.to(nVal);
@@ -287,7 +287,7 @@ export default {
     },
     //Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
     destroyed() {
-        var me = this,
+        let me = this,
             $itemsWrap = me.itemsWrap;
         unbindEvent(win, EV_RESIZE, me.adjRound);
         me.unbindDrag();
@@ -295,7 +295,7 @@ export default {
     },
     methods: {
         updateRender() {
-            var me = this,
+            let me = this,
 
                 loop = me.loop,
                 watchItems = me.watchItems,
@@ -316,11 +316,11 @@ export default {
                 me.cloneItems = $cloneItems;
             }
 
-            var $items = findNodes($itemsWrap, '.v-carousel-item');
+            let $items = findNodes($itemsWrap, '.v-carousel-item');
 
             //create cloned nodes
             if(hasLoop && !rewind) {
-                var firstNode = $items[0],
+                let firstNode = $items[0],
                     lastNode = $items[itemsLen - 1],
                     firstNodeCloned = cloneNode(firstNode, true),
                     lastNodeCloned = cloneNode(lastNode, true);
@@ -353,12 +353,12 @@ export default {
             me.checkAuto();
         },
         reset() {
-            var me = this;
+            let me = this;
             me.off();
             me.to(0);
         },
         checkDrag() {
-            var me = this,
+            let me = this,
                 mouseDrag = me.mouseDrag;
             me.unbindDrag();
             if(hasTouch || mouseDrag){
@@ -367,11 +367,11 @@ export default {
             }
         },
         unbindDrag() {
-            var me = this;
+            let me = this;
             unbindEvent(me.itemsWrap, EV_START, me.startCB);
         },
         checkAuto() {
-            var me = this,
+            let me = this,
                 auto = me.auto,
 
                 turnOff = me.off,
@@ -396,14 +396,14 @@ export default {
             }
         },
         rmAnim: function() {
-            var me = this,
+            let me = this,
                 $itemsWrap = me.itemsWrap;
             //reset reset animation
             doCSS($itemsWrap, PROP_TRANSITION, 'none');
             me.animPaused = true;
         },
         addAnim: function() {
-            var me = this,
+            let me = this,
                 $itemsWrap = me.itemsWrap;
             //Force to paint
             getOffset($itemsWrap);
@@ -412,7 +412,7 @@ export default {
             me.animPaused = false;
         },
         on() {
-            var me = this,
+            let me = this,
                 hasLoop = me.hasLoop,
                 itemsLen = me.itemsLen;
             me.off();
@@ -433,7 +433,7 @@ export default {
             }
         },
         off() {
-            var me = this;
+            let me = this;
             if(me.autoTimer) {
                 clearInterval(me.autoTimer);
                 me.autoTimer = null;
@@ -446,7 +446,7 @@ export default {
             this.nextPrev(DIR_PREV);
         },
         nextPrev(dir) {
-            var me = this,
+            let me = this,
                 hasLoop = me.hasLoop,
                 rewind = me.rewind,
                 itemsLen = me.itemsLen,
@@ -494,7 +494,7 @@ export default {
             me.to(index);
         },
         to(index) {
-            var me = this,
+            let me = this,
                 hasLoop = me.hasLoop,
                 itemsLen = me.itemsLen,
                 slideCount = me.slideCount,
@@ -548,7 +548,7 @@ export default {
             me.transTo(left);
         },
         checkTrans(){
-            var me = this,
+            let me = this,
                 transEndCB = me.transEndCB;
             //only fire once
             if(transEndCB){
@@ -560,7 +560,7 @@ export default {
             doCSS(this.itemsWrap, PROP_TRANSFORM, `translate3d(${moveTo}%,0,0)`);
         },
         startCB(e) {
-            var me = this,
+            let me = this,
                 $el = me.$el,
 
                 getEventData = me.getEv,
@@ -593,7 +593,7 @@ export default {
             }
 
             function moveHandler(e) {
-                var data = getEventData(e);
+                let data = getEventData(e);
                 stop = {
                     time: +new Date,
                     coords: [
@@ -613,18 +613,18 @@ export default {
                 // prevent scrolling
                 if (deltaX >= 3) {
                     start.interacting = true;
-                    var percent = currentPos + (((stop.coords[0] - start.coords[0]) / elWidth) * 100 / me.slideCount);
+                    let percent = currentPos + (((stop.coords[0] - start.coords[0]) / elWidth) * 100 / me.slideCount);
                     transTo(percent);
                     e.preventDefault();
                 }               
             }
 
             function snapback($itemsWrap, left) {
-                var slideCount = me.slideCount,
+                let slideCount = me.slideCount,
                     currentPos = getCurrentPos($itemsWrap) * slideCount,
-                    left = (left ? roundUp(currentPos) : roundDown(currentPos)) / slideCount;
+                    percent = (left ? roundUp(currentPos) : roundDown(currentPos)) / slideCount;
 
-                transTo(left);
+                transTo(percent);
             }
 
             function dragsnap(dir){
@@ -633,13 +633,13 @@ export default {
 
             bindEvent($itemsWrap, EV_MOVE, moveHandler);
             oneEvent($itemsWrap, EV_END, function(e) {
-                var activeIndex = me.activeIndex;
+                let activeIndex = me.activeIndex;
                 unbindEvent($itemsWrap, EV_MOVE, moveHandler);
 
                 addAnimation();
 
                 if(start && stop) {
-                    var deltaX = Math.abs(start.coords[0] - stop.coords[0]),
+                    let deltaX = Math.abs(start.coords[0] - stop.coords[0]),
                         deltaY = Math.abs(start.coords[1] - stop.coords[1]),
                         left = start.coords[0] > stop.coords[0],
                         jumppoint;
@@ -668,7 +668,7 @@ export default {
             });
         },
         getEv(e) {
-            var obj;
+            let obj;
             if (e.targetTouches) {
                 obj = e.targetTouches[0];
             }
@@ -683,7 +683,7 @@ export default {
         },
         //Account for iOS safari rounding problems
         adjRound() {
-            var me = this,
+            let me = this,
                 $el = me.$el,
                 $items = me.items,
                 diff = getWidth($el) - getWidth($items[0]);

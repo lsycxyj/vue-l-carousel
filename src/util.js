@@ -1,4 +1,4 @@
-var win = window,
+let win = window,
 	simpleSelectorRE = /^[\w-]*$/,
 	cssNumber = { 'column-count': 1, 'columns': 1, 'font-weight': 1, 'line-height': 1,'opacity': 1, 'z-index': 1, 'zoom': 1 },
 
@@ -8,11 +8,11 @@ var win = window,
 	round = Math.round; 
 
 function qsa(element, selector) {
-	var found,
+	let found,
 		maybeID = selector[0] == '#',
 		maybeClass = !maybeID && selector[0] == '.',
 		nameOnly = maybeID || maybeClass ? selector.slice(1) : selector, // Ensure that a 1 char tag name still gets checked
-		isSimple = simpleSelectorRE.test(nameOnly)
+		isSimple = simpleSelectorRE.test(nameOnly);
 	return (element.getElementById && isSimple && maybeID) ? // Safari DocumentFragment doesn't have getElementById
 		( (found = element.getElementById(nameOnly)) ? [found] : [] ) :
 		(element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) ? [] :
@@ -75,7 +75,7 @@ function append(element, target) {
 }
 
 function prepend(element, target) {
-	var childNodes = children(element);
+	let childNodes = children(element);
 	if(childNodes.length > 0) {
 		element.insertBefore(target, childNodes[0]);
 	}
@@ -93,7 +93,7 @@ function addClass(element, className) {
 }
 
 function remove(element) {
-	var $parent = element.parentNode;
+	let $parent = element.parentNode;
 	if($parent){
 		$parent.removeChild(element);
 	}
@@ -122,7 +122,7 @@ function maybeAddPx(name, value) {
 }
 
 function css(element, property, value) {
-	var elementSytle = element.style;
+	let elementSytle = element.style;
 	if (arguments.length < 3) {
 		return elementSytle[camelize(property)] || getComputedStyle(element, '').getPropertyValue(property);
 	}
@@ -137,19 +137,19 @@ function css(element, property, value) {
 }
 
 function each(elements, callback) {
-	for(var i = 0, len = elements.length, element; i < len; i++) {
+	for(let i = 0, len = elements.length, element; i < len; i++) {
 		element = elements[i];
 		callback.call(element, element, i);
 	}
 }
 
 function offset(element) {
-	var obj = element.getBoundingClientRect();
+	let obj = element.getBoundingClientRect();
 	return {
 		left: obj.left + win.pageXOffset,
 		top: obj.top + win.pageYOffset,
 		width: round(obj.width),
-		height: round(obj.height)
+		height: round(obj.height),
 	};
 }
 
@@ -157,7 +157,7 @@ function width(element) {
 	return offset(element).width;
 }
 
-var $ = {
+const $ = {
 	qsa,
 	on,
 	off,
@@ -175,10 +175,8 @@ var $ = {
 	css,
 	each,
 	offset,
-	width
+	width,
 };
 
 
-export {
-	$
-};
+export default $;

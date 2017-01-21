@@ -1,6 +1,7 @@
 var path = require('path'),
 	config = require('./conf');
-var projectRoot = path.resolve(__dirname, '../');
+var projectRoot = path.resolve(__dirname, '../'),
+	projectSrc = path.resolve(projectRoot, 'src');
 
 module.exports = {
 	entry: {
@@ -21,6 +22,24 @@ module.exports = {
 		fallback: [path.join(__dirname, '../node_modules')]
 	},
 	module: {
+		preLoaders: [
+			{
+				test: /\.js$/,
+				loader: 'eslint',
+				exclude: /node_modules/,
+				include: [
+					projectSrc
+				]
+			},
+			{
+				test: /\.vue$/,
+				loader: 'eslint',
+				exclude: /node_modules/,
+				include: [
+					projectSrc
+				]
+			}
+		],
 		loaders: [
 			{
 				test: /\.vue$/,
@@ -32,6 +51,16 @@ module.exports = {
 				include: projectRoot,
 				exclude: /node_modules/
 			}
+		]
+	},
+	eslint: {
+		formatter: require('eslint-friendly-formatter')
+	},
+	vue: {
+		postcss: [
+			require('autoprefixer')({
+				browsers: ['last 2 versions']
+			})
 		]
 	}
 };
