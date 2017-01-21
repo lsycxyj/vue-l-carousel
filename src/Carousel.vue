@@ -24,13 +24,13 @@
         background: rgba(0, 0, 0, .5);
     }
     &-nav{
-        @h: 30px;
         &.prev{
             left: 0;
         }
         &.next{
             right: 0;
         }
+        @h: 30px;
         cursor: pointer;
         position: absolute;
         line-height: @h;
@@ -106,13 +106,14 @@ const win = window,
     EV_PREV = 'prev',
     EV_TO = 'to',
 
-    Events = {
-        EV_CHANGED_INDEX,
-        EV_RENDER_UPDATED,
-        EV_NEXT,
-        EV_PREV,
-        EV_TO
-    },
+    
+    //Events = {
+    //    EV_CHANGED_INDEX,
+    //    EV_RENDER_UPDATED,
+    //    EV_NEXT,
+    //    EV_PREV,
+    //    EV_TO
+    //},
     
     EV_START = hasTouch ? EV_TOUCH_START : EV_MOUSE_DOWN,
     EV_MOVE = hasTouch ? EV_TOUCH_MOVE : EV_MOUSE_MOVE,
@@ -146,9 +147,10 @@ function round(oVal, method) {
     return method(oVal / 100) * 100;
 }
 
-export {
-    Events
-};
+//named exports are not supported in *.vue files. Shoot!
+//export {
+//    Events
+//};
 
 export default {
     props: {
@@ -300,7 +302,7 @@ export default {
                 itemsLen = watchItems.length,
                 rewind = me.rewind,
                 hasLoop = loop && itemsLen > 1,
-                slideCount = hasLoop ? itemsLen + 2 : itemsLen, 
+                slideCount = hasLoop && !rewind ? itemsLen + 2 : itemsLen, 
 
                 $itemsWrap = me.itemsWrap,
                 $cloneItems = me.cloneItems;
@@ -496,6 +498,7 @@ export default {
                 hasLoop = me.hasLoop,
                 itemsLen = me.itemsLen,
                 slideCount = me.slideCount,
+                rewind = me.rewind,
                 lastItemIndex = itemsLen - 1,
 
                 removeAnimation = me.rmAnim,
@@ -522,7 +525,7 @@ export default {
                     };
                 }
 
-                realIndex = index + 1;
+                realIndex = !rewind ? index + 1 : index;
             }
             else {
                 realIndex = index;

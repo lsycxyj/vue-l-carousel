@@ -6,14 +6,15 @@
 <template>
     <div id="app">
         <h3>Vue Carousel Example</h3>
-        <carousel ref="car" @changed-index="log" @render-updated="log('render-updated')" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed">
+        <carousel ref="car" @changed-index="log" @render-updated="log('render-updated')" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind">
             <carousel-item v-for="(item, index) in list">
                 <p>CarouselItem{{index}}, URL is {{item.url}}</p>
             </carousel-item>
         </carousel>
         <div>
-            <button @click="toggleAuto()">toggle auto</button>
-            <button @click="toggleLoop()">toggle loop</button>
+            <button @click="toggleAuto()">toggle auto: {{auto}}</button>
+            <button @click="toggleLoop()">toggle loop: {{loop}}</button>
+            <button @click="toggleRewind()">toggle rewind: {{rewind}}</button>
             <button @click="changeList()">change list</button>
         </div>
         <div>
@@ -67,7 +68,8 @@ export default {
             auto: 0,
             list: list1,
             speed: 300,
-            loop: true
+            loop: true,
+            rewind: false
         };
     },
     mounted() {
@@ -82,6 +84,9 @@ export default {
         },
         toggleLoop() {
             this.loop = !this.loop;
+        },
+        toggleRewind() {
+            this.rewind = !this.rewind;
         },
         log(content) {
             log(content);
