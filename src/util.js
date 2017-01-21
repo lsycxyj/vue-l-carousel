@@ -1,58 +1,20 @@
-let win = window,
+/* global getComputedStyle window */
+const win = window,
 	simpleSelectorRE = /^[\w-]*$/,
-	cssNumber = { 'column-count': 1, 'columns': 1, 'font-weight': 1, 'line-height': 1,'opacity': 1, 'z-index': 1, 'zoom': 1 },
+	cssNumber = {
+		'column-count': 1,
+		columns: 1,
+		'font-weight': 1,
+		'line-height': 1,
+		opacity: 1,
+		'z-index': 1,
+		zoom: 1,
+	},
 
 	emptyArr = [],
 	slice = emptyArr.slice,
-	
-	round = Math.round; 
 
-function qsa(element, selector) {
-	let found,
-		maybeID = selector[0] == '#',
-		maybeClass = !maybeID && selector[0] == '.',
-		nameOnly = maybeID || maybeClass ? selector.slice(1) : selector, // Ensure that a 1 char tag name still gets checked
-		isSimple = simpleSelectorRE.test(nameOnly);
-	return (element.getElementById && isSimple && maybeID) ? // Safari DocumentFragment doesn't have getElementById
-		( (found = element.getElementById(nameOnly)) ? [found] : [] ) :
-		(element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) ? [] :
-		slice.call(
-			isSimple && !maybeID && element.getElementsByClassName ? // DocumentFragment doesn't have getElementsByClassName/TagName
-				maybeClass ? element.getElementsByClassName(nameOnly) : // If it's simple, it could be a class
-				element.getElementsByTagName(selector) : // Or a tag
-				element.querySelectorAll(selector) // Or it's not simple, and we need to query all
-		)
-}
-
-function on(element, ev, callback) {
-	if(isStr(ev)) {
-		element.addEventListener(ev, callback);
-	}
-	else if(isArr(ev)) {
-		each(ev, function(e) {
-			on(element, e, callback);
-		});
-	}
-}
-
-function off(element, ev, callback) {
-	if(isStr(ev)) {
-		element.removeEventListener(ev, callback);
-	}
-	else if(isArr(ev)) {
-		each(ev, function(e) {
-			on(element, e, callback);
-		});
-	}
-}
-
-function one(element, ev, callback) {
-	function handler(){
-		callback.apply(this, arguments);
-		off(element, ev, handler);
-	}
-	on(element, ev, handler);
-}
+	round = Math.round;
 
 function type(o) {
 	return typeof o;
@@ -66,8 +28,67 @@ function isStr(o) {
 	return type(o) == 'string';
 }
 
+function qsa(element, selector) {
+	// From Zepto
+	/* eslint no-nested-ternary: 0 no-cond-assign: 0  */
+	let found;
+	const maybeID = selector[0] == '#',
+		maybeClass = !maybeID && selector[0] == '.',
+		// Ensure that a 1 char tag name still gets checked
+		nameOnly = maybeID || maybeClass ? selector.slice(1) : selector,
+		isSimple = simpleSelectorRE.test(nameOnly);
+	// Safari DocumentFragment doesn't have getElementById
+	return (element.getElementById && isSimple && maybeID) ?
+		((found = element.getElementById(nameOnly)) ? [found] : []) :
+		(element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) ? [] :
+			slice.call(
+				// DocumentFragment doesn't have getElementsByClassName/TagName
+				isSimple && !maybeID && element.getElementsByClassName ?
+					// If it's simple, it could be a class
+					maybeClass ? element.getElementsByClassName(nameOnly) :
+						element.getElementsByTagName(selector) : // Or a tag
+					element.querySelectorAll(selector), // Or it's not simple, and we need to query all
+			);
+}
+
+function each(elements, callback) {
+	for (let i = 0, len = elements.length, element; i < len; i++) {
+		element = elements[i];
+		callback.call(element, element, i);
+	}
+}
+
+function on(element, ev, callback) {
+	if (isStr(ev)) {
+		element.addEventListener(ev, callback);
+	} else if (isArr(ev)) {
+		each(ev, e => on(element, e, callback));
+	}
+}
+
+function off(element, ev, callback) {
+	if (isStr(ev)) {
+		element.removeEventListener(ev, callback);
+	} else if (isArr(ev)) {
+		each(ev, e => on(element, e, callback));
+	}
+}
+
+function one(element, ev, callback) {
+	function handler(...args) {
+		callback.apply(this, args);
+		off(element, ev, handler);
+	}
+
+	on(element, ev, handler);
+}
+
 function attr(element, name) {
 	return element.getAttribute(name);
+}
+
+function children(element) {
+	return element.childNodes;
 }
 
 function append(element, target) {
@@ -75,11 +96,10 @@ function append(element, target) {
 }
 
 function prepend(element, target) {
-	let childNodes = children(element);
-	if(childNodes.length > 0) {
+	const childNodes = children(element);
+	if (childNodes.length > 0) {
 		element.insertBefore(target, childNodes[0]);
-	}
-	else {
+	} else {
 		append(element, target);
 	}
 }
@@ -93,58 +113,42 @@ function addClass(element, className) {
 }
 
 function remove(element) {
-	let $parent = element.parentNode;
-	if($parent){
+	const $parent = element.parentNode;
+	if ($parent) {
 		$parent.removeChild(element);
 	}
 }
 
-function children(element) {
-	return element.childNodes;
-}
-
-function camelize(str) { 
-	return str.replace(/-+(.)?/g, function(match, chr){ 
-		return chr ? chr.toUpperCase() : '' 
-	});
+function camelize(str) {
+	return str.replace(/-+(.)?/g, (match, chr) => (chr ? chr.toUpperCase() : ''));
 }
 
 function dasherize(str) {
 	return str.replace(/::/g, '/')
-		   .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
-		   .replace(/([a-z\d])([A-Z])/g, '$1_$2')
-		   .replace(/_/g, '-')
-		   .toLowerCase()
+		.replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+		.replace(/([a-z\d])([A-Z])/g, '$1_$2')
+		.replace(/_/g, '-')
+		.toLowerCase();
 }
 
 function maybeAddPx(name, value) {
-	return (typeof value == "number" && !cssNumber[dasherize(name)]) ? value + "px" : value;
+	return (type(value) == 'number' && !cssNumber[dasherize(name)]) ? `${value}px` : value;
 }
 
 function css(element, property, value) {
-	let elementSytle = element.style;
+	/* eslint consistent-return: 0 */
+	const elementSytle = element.style;
 	if (arguments.length < 3) {
 		return elementSytle[camelize(property)] || getComputedStyle(element, '').getPropertyValue(property);
-	}
-	else {
-		if(!value && value !== 0) {
-			elementSytle.removeProperty(dasherize(property));
-		}
-		else {
-			elementSytle[dasherize(property)] = maybeAddPx(property, value);
-		}
-	}
-}
-
-function each(elements, callback) {
-	for(let i = 0, len = elements.length, element; i < len; i++) {
-		element = elements[i];
-		callback.call(element, element, i);
+	} else if (!value && value !== 0) {
+		elementSytle.removeProperty(dasherize(property));
+	} else {
+		elementSytle[dasherize(property)] = maybeAddPx(property, value);
 	}
 }
 
 function offset(element) {
-	let obj = element.getBoundingClientRect();
+	const obj = element.getBoundingClientRect();
 	return {
 		left: obj.left + win.pageXOffset,
 		top: obj.top + win.pageYOffset,

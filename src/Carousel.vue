@@ -1,700 +1,704 @@
 <style lang="less">
-.v-carousel {
-    &-items {
-        overflow: hidden;
-    }
-    &-dots {
-        position: absolute;
-        bottom: 10px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-    }
-    &-dot {
-        &.active {
-            background: #000;
-            cursor: default;
-        }
-        cursor: pointer;
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        margin: 0 5px;
-        border-radius: 5px;
-        background: rgba(0, 0, 0, .5);
-    }
-    &-nav{
-        &.prev{
-            left: 0;
-        }
-        &.next{
-            right: 0;
-        }
-        @h: 30px;
-        cursor: pointer;
-        position: absolute;
-        line-height: @h;
-        color: #FFF;
-        padding: 0 5px;
-        background: rgba(0, 0, 0, .5);
-        top: 50%;
-        margin-top: -@h / 2;
-    }
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-}
+	.v-carousel {
+		&-items {
+			overflow: hidden;
+		}
+		&-dots {
+			position: absolute;
+			bottom: 10px;
+			left: 0;
+			width: 100%;
+			text-align: center;
+		}
+		&-dot {
+			&.active {
+				background: #000;
+				cursor: default;
+			}
+			cursor: pointer;
+			display: inline-block;
+			width: 10px;
+			height: 10px;
+			margin: 0 5px;
+			border-radius: 5px;
+			background: rgba(0, 0, 0, .5);
+		}
+		&-nav {
+			&.prev {
+				left: 0;
+			}
+			&.next {
+				right: 0;
+			}
+			@h: 30px;
+			cursor: pointer;
+			position: absolute;
+			line-height: @h;
+			color: #FFF;
+			padding: 0 5px;
+			background: rgba(0, 0, 0, .5);
+			top: 50%;
+			margin-top: -@h / 2;
+		}
+		width: 100%;
+		overflow: hidden;
+		position: relative;
+	}
 </style>
 
 <template>
-    <!--
-        Don't use v-bind to bind events which are not available,
-        Otherwise Vue will go on rendering with many bugs sliently as in many other places.
-    -->
-    <div class="v-carousel">
-        <slot name="before"></slot>
-        <div class="v-carousel-items">
-            <slot></slot>
-        </div>
-        <div class="v-carousel-dots" :style="dotsStyle" v-if="dots">
-            <div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" @click="to(index)" v-for="(item, index) in watchItems"></div>
-        </div>
-        <div class="v-carousel-nav prev" @click="prev" v-show="hasLoop || (itemsLen > 1 && activeIndex > 0)" v-html="prevHTML"></div>
-        <div class="v-carousel-nav next" @click="next" v-show="hasLoop || (itemsLen > 1 && activeIndex < itemsLen - 1)" v-html="nextHTML"></div>
-        <slot name="after"></slot>
-    </div>
+	<!--
+		Don't use v-bind to bind events which are not available,
+		Otherwise Vue will go on rendering with many bugs sliently as in many other places.
+	-->
+	<div class="v-carousel">
+		<slot name="before"></slot>
+		<div class="v-carousel-items">
+			<slot></slot>
+		</div>
+		<div class="v-carousel-dots" :style="dotsStyle" v-if="dots">
+			<div :class="{'v-carousel-dot': true, 'active': activeIndex==index}" @click="to(index)"
+				 v-for="(item, index) in watchItems"></div>
+		</div>
+		<div class="v-carousel-nav prev" @click="prev" v-show="hasLoop || (itemsLen > 1 && activeIndex > 0)"
+			 v-html="prevHTML"></div>
+		<div class="v-carousel-nav next" @click="next" v-show="hasLoop || (itemsLen > 1 && activeIndex < itemsLen - 1)"
+			 v-html="nextHTML"></div>
+		<slot name="after"></slot>
+	</div>
 </template>
 
 <script>
 import $ from './util';
 
 const win = window,
-    doc = document,
-    navigator = win.navigator,
-    ua = navigator.userAgent || navigator.appVersion,
-    vendor = (/webkit/i).test(ua) ? 'webkit' : (/firefox/i).test(ua) ? 'moz' : 'opera' in win ? 'o'  : '',
-    cssVendor = vendor ? '-' + vendor.toLowerCase() + '-' : '', 
+	doc = document,
+	navigator = win.navigator,
+	ua = navigator.userAgent || navigator.appVersion,
+	vendor = (/webkit/i).test(ua) ? 'webkit' : (/firefox/i).test(ua) ? 'moz' : 'opera' in win ? 'o'  : '',
+	cssVendor = vendor ? '-' + vendor.toLowerCase() + '-' : '', 
 
-    PROP_TRANSITION = cssVendor + 'transition',
-    PROP_TRANSFORM = cssVendor + 'transform',
+	PROP_TRANSITION = cssVendor + 'transition',
+	PROP_TRANSFORM = cssVendor + 'transform',
 
-    hasTouch = !!('ontouchstart' in win || navigator.maxTouchPoints),
+	hasTouch = !!('ontouchstart' in win || navigator.maxTouchPoints),
 
-    DIR_PREV = 'prev',
-    DIR_NEXT = 'next',
+	DIR_PREV = 'prev',
+	DIR_NEXT = 'next',
 
-    //unable to detect the exact event
-    EV_TRANSITION_END = ['transitionend','OTransitionEnd','webkitTransitionEnd'],
+	//unable to detect the exact event
+	EV_TRANSITION_END = ['transitionend','OTransitionEnd','webkitTransitionEnd'],
 
-    EV_TOUCH_START = 'touchstart',
-    EV_TOUCH_END = 'touchend',
-    EV_TOUCH_MOVE = 'touchmove',
+	EV_TOUCH_START = 'touchstart',
+	EV_TOUCH_END = 'touchend',
+	EV_TOUCH_MOVE = 'touchmove',
 
-    EV_MOUSE_ENTER = 'mouseenter',
-    EV_MOUSE_LEAVE = 'mouseleave',
+	EV_MOUSE_ENTER = 'mouseenter',
+	EV_MOUSE_LEAVE = 'mouseleave',
 
-    EV_MOUSE_DOWN = 'mousedown',
-    EV_MOUSE_UP = 'mouseup',
-    EV_MOUSE_MOVE = 'mousemove',
+	EV_MOUSE_DOWN = 'mousedown',
+	EV_MOUSE_UP = 'mouseup',
+	EV_MOUSE_MOVE = 'mousemove',
 
-    EV_RESIZE = 'resize',
+	EV_RESIZE = 'resize',
 
-    //Custom events
-    EV_CHANGED_INDEX = 'changed-index',
-    EV_RENDER_UPDATED = 'render-updated',
-    EV_NEXT = 'next',
-    EV_PREV = 'prev',
-    EV_TO = 'to',
+	//Custom events
+	EV_CHANGED_INDEX = 'changed-index',
+	EV_RENDER_UPDATED = 'render-updated',
+	EV_NEXT = 'next',
+	EV_PREV = 'prev',
+	EV_TO = 'to',
 
-    
-    //Events = {
-    //    EV_CHANGED_INDEX,
-    //    EV_RENDER_UPDATED,
-    //    EV_NEXT,
-    //    EV_PREV,
-    //    EV_TO
-    //},
-    
-    EV_START = hasTouch ? EV_TOUCH_START : EV_MOUSE_DOWN,
-    EV_MOVE = hasTouch ? EV_TOUCH_MOVE : EV_MOUSE_MOVE,
-    EV_END = hasTouch ? EV_TOUCH_END : EV_MOUSE_UP;
+	
+	//Events = {
+	//	  EV_CHANGED_INDEX,
+	//	  EV_RENDER_UPDATED,
+	//	  EV_NEXT,
+	//	  EV_PREV,
+	//	  EV_TO
+	//},
+	
+	EV_START = hasTouch ? EV_TOUCH_START : EV_MOUSE_DOWN,
+	EV_MOVE = hasTouch ? EV_TOUCH_MOVE : EV_MOUSE_MOVE,
+	EV_END = hasTouch ? EV_TOUCH_END : EV_MOUSE_UP;
 
 const findNodes = $.qsa,
-    bindEvent = $.on,
-    unbindEvent = $.off,
-    oneEvent = $.one,
-    appendNode = $.append,
-    prependNode = $.prepend,
-    cloneNode = $.clone,
-    removeNode = $.remove,
-    addClass = $.addClass,
-    getAttr = $.attr,
-    doCSS = $.css,
-    getWidth = $.width,
-    getOffset = $.offset,
-    each = $.each;
+	bindEvent = $.on,
+	unbindEvent = $.off,
+	oneEvent = $.one,
+	appendNode = $.append,
+	prependNode = $.prepend,
+	cloneNode = $.clone,
+	removeNode = $.remove,
+	addClass = $.addClass,
+	getAttr = $.attr,
+	doCSS = $.css,
+	getWidth = $.width,
+	getOffset = $.offset,
+	each = $.each;
 
 function roundUp(oVal) {
-    return round(oVal, Math.ceil);
+	return round(oVal, Math.ceil);
 }
 
 function roundDown(oVal) {
-    return round(oVal, Math.floor);
+	return round(oVal, Math.floor);
 }
 
 function round(oVal, method) {
-    let val = parseInt(oVal, 10);
-    return method(oVal / 100) * 100;
+	let val = parseInt(oVal, 10);
+	return method(oVal / 100) * 100;
 }
 
 //named exports are not supported in *.vue files. Shoot!
 //export {
-//    Events
+//	  Events
 //};
 
 export default {
-    props: {
-        //HTML content of the previous button.
-        prevHTML: {
-            type: String,
-            default: '&lt;'
-        },
-        //HTML content of the enext button.
-        nextHTML: {
-            type: String,
-            default: '&gt;'
-        },
-        //The time of the transition animation. In ms.
-        speed: {
-            type: Number,
-            default: 300
-        },
-        //It can go to next/previous slide at the ends if it's set to true. It works only the items' length more than 1.
-        loop: {
-            type: Boolean,
-            default: false
-        },
-        //Rewind to the other end instead of endless loop but you can only go to the other end by previous or next button, if it's set to true. It works only loop is set to true.
-        rewind: {
-            type: Boolean,
-            default: false
-        },
-        //It can be drag by mouse if it's set to true.
-        mouseDrag: {
-            type: Boolean,
-            default: false
-        },
-        //Autoplay interval. In ms. 0 for no autoplay.
-        auto: {
-            type: Number,
-            default: 0
-        },
-        //Pagination is available if it's set to true.
-        dots: {
-            type: Boolean,
-            default: true
-        },
-        //Style of v-carousel-dots
-        dotsStyle: {
-            type: [Object, String, Array],
-            default: ''
-        },
-        //The original data list used to render the CarouselItems. The component will rerender if this property changes.
-        watchItems: {
-            type: Array,
-            default() {
-                return [];
-            }
-        }
-    },
-    data() {
-        return {
-            //It seems that key with symbols can't be accessced directly from vm.
-            activeIndex: 0,
-            animPaused: true,
-            itemsLen: 0,
-            slideCount: 0,
-            hasLoop: false,
-            autoTimer: null,
-            //Nodes
-            cloneItems: [],
-            items: null,
-            itemsWrap: null,
-            //Callbacks
-            transEndCB: null
-        };
-    },
-    mounted() {
-        let me = this,
+	props: {
+		//HTML content of the previous button.
+		prevHTML: {
+			type: String,
+			default: '&lt;'
+		},
+		//HTML content of the enext button.
+		nextHTML: {
+			type: String,
+			default: '&gt;'
+		},
+		//The time of the transition animation. In ms.
+		speed: {
+			type: Number,
+			default: 300
+		},
+		//It can go to next/previous slide at the ends if it's set to true. It works only the items' length more than 1.
+		loop: {
+			type: Boolean,
+			default: false
+		},
+		//Rewind to the other end instead of endless loop but you can only go to the other end by previous or next button, if it's set to true. It works only loop is set to true.
+		rewind: {
+			type: Boolean,
+			default: false
+		},
+		//It can be drag by mouse if it's set to true.
+		mouseDrag: {
+			type: Boolean,
+			default: false
+		},
+		//Autoplay interval. In ms. 0 for no autoplay.
+		auto: {
+			type: Number,
+			default: 0
+		},
+		//Pagination is available if it's set to true.
+		dots: {
+			type: Boolean,
+			default: true
+		},
+		//Style of v-carousel-dots
+		dotsStyle: {
+			type: [Object, String, Array],
+			default: ''
+		},
+		//The original data list used to render the CarouselItems. The component will rerender if this property changes.
+		watchItems: {
+			type: Array,
+			default() {
+				return [];
+			}
+		}
+	},
+	data() {
+		return {
+			//It seems that key with symbols can't be accessced directly from vm.
+			activeIndex: 0,
+			animPaused: true,
+			itemsLen: 0,
+			slideCount: 0,
+			hasLoop: false,
+			autoTimer: null,
+			//Nodes
+			cloneItems: [],
+			items: null,
+			itemsWrap: null,
+			//Callbacks
+			transEndCB: null
+		};
+	},
+	mounted() {
+		let me = this,
 
-            $el = me.$el,
-            $itemsWrap = findNodes($el, '.v-carousel-items')[0],
-            
-            updateRender = function(){
-                me.updateRender();
-                emitChangedIndex();
-                emit(EV_RENDER_UPDATED);
-            },
-            checkDrag = me.checkDrag,
-            adjRound = me.adjRound;
+			$el = me.$el,
+			$itemsWrap = findNodes($el, '.v-carousel-items')[0],
+			
+			updateRender = function(){
+				me.updateRender();
+				emitChangedIndex();
+				emit(EV_RENDER_UPDATED);
+			},
+			checkDrag = me.checkDrag,
+			adjRound = me.adjRound;
 
-        me.itemsWrap = $itemsWrap;
+		me.itemsWrap = $itemsWrap;
 
-        function watch(k, v){
-            me.$watch(k, v);
-        }
+		function watch(k, v){
+			me.$watch(k, v);
+		}
 
-        function listen(e, cb){
-            me.$on(e, cb);
-        }
+		function listen(e, cb){
+			me.$on(e, cb);
+		}
 
-        function emit(e, v){
-            me.$emit(e, v);
-        }
+		function emit(e, v){
+			me.$emit(e, v);
+		}
 
-        function emitChangedIndex() {
-            let index = me.activeIndex;
-            emit(EV_CHANGED_INDEX, {
-                index: index,
-                total: me.itemsLen,
-                item: me.watchItems[index]
-            });
-        }
+		function emitChangedIndex() {
+			let index = me.activeIndex;
+			emit(EV_CHANGED_INDEX, {
+				index: index,
+				total: me.itemsLen,
+				item: me.watchItems[index]
+			});
+		}
 
-        watch('watchItems', updateRender);
-        watch('loop', updateRender);
-        watch('rewind', updateRender);
-        watch('mouseDrag', checkDrag);
-        watch('auto', me.checkAuto);
-        watch('activeIndex', emitChangedIndex);
+		watch('watchItems', updateRender);
+		watch('loop', updateRender);
+		watch('rewind', updateRender);
+		watch('mouseDrag', checkDrag);
+		watch('auto', me.checkAuto);
+		watch('activeIndex', emitChangedIndex);
 
-        listen(EV_PREV, me.prev);
-        listen(EV_NEXT, me.next);
-        listen(EV_TO, function(v){
-            let nVal = parseInt(v, 10),
-                itemsLen = me.itemsLen;
-            if(v !== NaN && itemsLen > 0 && nVal >= 0 && nVal < itemsLen) {
-                me.to(nVal);
-            }
-        });
+		listen(EV_PREV, me.prev);
+		listen(EV_NEXT, me.next);
+		listen(EV_TO, function(v){
+			let nVal = parseInt(v, 10),
+				itemsLen = me.itemsLen;
+			if(v !== NaN && itemsLen > 0 && nVal >= 0 && nVal < itemsLen) {
+				me.to(nVal);
+			}
+		});
 
-        checkDrag();
-        updateRender();
-        adjRound();
+		checkDrag();
+		updateRender();
+		adjRound();
 
-        bindEvent(win, EV_RESIZE, adjRound);
-        bindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
-    },
-    //Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
-    destroyed() {
-        let me = this,
-            $itemsWrap = me.itemsWrap;
-        unbindEvent(win, EV_RESIZE, me.adjRound);
-        me.unbindDrag();
-        unbindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
-    },
-    methods: {
-        updateRender() {
-            let me = this,
+		bindEvent(win, EV_RESIZE, adjRound);
+		bindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
+	},
+	//Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
+	destroyed() {
+		let me = this,
+			$itemsWrap = me.itemsWrap;
+		unbindEvent(win, EV_RESIZE, me.adjRound);
+		me.unbindDrag();
+		unbindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
+	},
+	methods: {
+		updateRender() {
+			let me = this,
 
-                loop = me.loop,
-                watchItems = me.watchItems,
-                itemsLen = watchItems.length,
-                rewind = me.rewind,
-                hasLoop = loop && itemsLen > 1,
-                slideCount = hasLoop && !rewind ? itemsLen + 2 : itemsLen, 
+				loop = me.loop,
+				watchItems = me.watchItems,
+				itemsLen = watchItems.length,
+				rewind = me.rewind,
+				hasLoop = loop && itemsLen > 1,
+				slideCount = hasLoop && !rewind ? itemsLen + 2 : itemsLen, 
 
-                $itemsWrap = me.itemsWrap,
-                $cloneItems = me.cloneItems;
+				$itemsWrap = me.itemsWrap,
+				$cloneItems = me.cloneItems;
 
-            //clean up
-            if($cloneItems.length > 0){
-                each($cloneItems, function($item){
-                    removeNode($item);
-                });
-                $cloneItems = [];
-                me.cloneItems = $cloneItems;
-            }
+			//clean up
+			if($cloneItems.length > 0){
+				each($cloneItems, function($item){
+					removeNode($item);
+				});
+				$cloneItems = [];
+				me.cloneItems = $cloneItems;
+			}
 
-            let $items = findNodes($itemsWrap, '.v-carousel-item');
+			let $items = findNodes($itemsWrap, '.v-carousel-item');
 
-            //create cloned nodes
-            if(hasLoop && !rewind) {
-                let firstNode = $items[0],
-                    lastNode = $items[itemsLen - 1],
-                    firstNodeCloned = cloneNode(firstNode, true),
-                    lastNodeCloned = cloneNode(lastNode, true);
-                appendNode($itemsWrap, firstNodeCloned);
-                prependNode($itemsWrap, lastNodeCloned);
+			//create cloned nodes
+			if(hasLoop && !rewind) {
+				let firstNode = $items[0],
+					lastNode = $items[itemsLen - 1],
+					firstNodeCloned = cloneNode(firstNode, true),
+					lastNodeCloned = cloneNode(lastNode, true);
+				appendNode($itemsWrap, firstNodeCloned);
+				prependNode($itemsWrap, lastNodeCloned);
 
-                $cloneItems.push(firstNodeCloned);
-                $cloneItems.push(lastNodeCloned);
-                each($cloneItems, function($item){
-                    addClass($item, 'cloned');
-                });
+				$cloneItems.push(firstNodeCloned);
+				$cloneItems.push(lastNodeCloned);
+				each($cloneItems, function($item){
+					addClass($item, 'cloned');
+				});
 
-                $items = findNodes($itemsWrap, '.v-carousel-item');
-            }
+				$items = findNodes($itemsWrap, '.v-carousel-item');
+			}
 
-            me.hasLoop = hasLoop;
-            me.itemsLen = itemsLen;
-            me.slideCount = slideCount;
-            me.items = $items;
+			me.hasLoop = hasLoop;
+			me.itemsLen = itemsLen;
+			me.slideCount = slideCount;
+			me.items = $items;
 
-            doCSS($itemsWrap, 'width', 100 * slideCount + '%');
-            each($items, function(element){
-                doCSS(element, 'width', (100 / slideCount) + '%');
-            });
+			doCSS($itemsWrap, 'width', 100 * slideCount + '%');
+			each($items, function(element){
+				doCSS(element, 'width', (100 / slideCount) + '%');
+			});
 
-            me.rmAnim();
-            me.adjRound();
-            me.reset();
-            me.addAnim();
-            me.checkAuto();
-        },
-        reset() {
-            let me = this;
-            me.off();
-            me.to(0);
-        },
-        checkDrag() {
-            let me = this,
-                mouseDrag = me.mouseDrag;
-            me.unbindDrag();
-            if(hasTouch || mouseDrag){
-                //DragSnap support
-                bindEvent(me.itemsWrap, EV_START, me.startCB);
-            }
-        },
-        unbindDrag() {
-            let me = this;
-            unbindEvent(me.itemsWrap, EV_START, me.startCB);
-        },
-        checkAuto() {
-            let me = this,
-                auto = me.auto,
+			me.rmAnim();
+			me.adjRound();
+			me.reset();
+			me.addAnim();
+			me.checkAuto();
+		},
+		reset() {
+			let me = this;
+			me.off();
+			me.to(0);
+		},
+		checkDrag() {
+			let me = this,
+				mouseDrag = me.mouseDrag;
+			me.unbindDrag();
+			if(hasTouch || mouseDrag){
+				//DragSnap support
+				bindEvent(me.itemsWrap, EV_START, me.startCB);
+			}
+		},
+		unbindDrag() {
+			let me = this;
+			unbindEvent(me.itemsWrap, EV_START, me.startCB);
+		},
+		checkAuto() {
+			let me = this,
+				auto = me.auto,
 
-                turnOff = me.off,
-                turnOn = me.on,
+				turnOff = me.off,
+				turnOn = me.on,
 
-                $itemsWrap = me.itemsWrap;
+				$itemsWrap = me.itemsWrap;
 
-            unbindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
-            unbindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
-            unbindEvent($itemsWrap, EV_START, turnOff);
-            unbindEvent($itemsWrap, EV_END, turnOn);
+			unbindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
+			unbindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
+			unbindEvent($itemsWrap, EV_START, turnOff);
+			unbindEvent($itemsWrap, EV_END, turnOn);
 
-            if(auto > 0) {
-                bindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
-                bindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
-                bindEvent($itemsWrap, EV_START, turnOff);
-                bindEvent($itemsWrap, EV_END, turnOn);
-                turnOn();
-            }
-            else {
-                turnOff();
-            }
-        },
-        rmAnim: function() {
-            let me = this,
-                $itemsWrap = me.itemsWrap;
-            //reset reset animation
-            doCSS($itemsWrap, PROP_TRANSITION, 'none');
-            me.animPaused = true;
-        },
-        addAnim: function() {
-            let me = this,
-                $itemsWrap = me.itemsWrap;
-            //Force to paint
-            getOffset($itemsWrap);
+			if(auto > 0) {
+				bindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
+				bindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
+				bindEvent($itemsWrap, EV_START, turnOff);
+				bindEvent($itemsWrap, EV_END, turnOn);
+				turnOn();
+			}
+			else {
+				turnOff();
+			}
+		},
+		rmAnim: function() {
+			let me = this,
+				$itemsWrap = me.itemsWrap;
+			//reset reset animation
+			doCSS($itemsWrap, PROP_TRANSITION, 'none');
+			me.animPaused = true;
+		},
+		addAnim: function() {
+			let me = this,
+				$itemsWrap = me.itemsWrap;
+			//Force to paint
+			getOffset($itemsWrap);
 
-            doCSS($itemsWrap, PROP_TRANSITION, PROP_TRANSFORM + ' ' + (me.speed / 1000) + 's ease');
-            me.animPaused = false;
-        },
-        on() {
-            let me = this,
-                hasLoop = me.hasLoop,
-                itemsLen = me.itemsLen;
-            me.off();
-            if(itemsLen.length > 1){
-                me.autoTimer = setInterval(function(){
-                    if(!hasLoop){
-                        if(me.activeIndex == itemsLen - 1){
-                            me.to(0);
-                        }
-                        else {
-                            me.next();
-                        }
-                    }
-                    else {
-                        me.next();
-                    }
-                }, me.auto);
-            }
-        },
-        off() {
-            let me = this;
-            if(me.autoTimer) {
-                clearInterval(me.autoTimer);
-                me.autoTimer = null;
-            }
-        },
-        next() {
-            this.nextPrev(DIR_NEXT);
-        },
-        prev() {
-            this.nextPrev(DIR_PREV);
-        },
-        nextPrev(dir) {
-            let me = this,
-                hasLoop = me.hasLoop,
-                rewind = me.rewind,
-                itemsLen = me.itemsLen,
-                lastItemIndex = itemsLen - 1,
-                activeIndex = me.activeIndex,
-                index;
+			doCSS($itemsWrap, PROP_TRANSITION, PROP_TRANSFORM + ' ' + (me.speed / 1000) + 's ease');
+			me.animPaused = false;
+		},
+		on() {
+			let me = this,
+				hasLoop = me.hasLoop,
+				itemsLen = me.itemsLen;
+			me.off();
+			if(itemsLen.length > 1){
+				me.autoTimer = setInterval(function(){
+					if(!hasLoop){
+						if(me.activeIndex == itemsLen - 1){
+							me.to(0);
+						}
+						else {
+							me.next();
+						}
+					}
+					else {
+						me.next();
+					}
+				}, me.auto);
+			}
+		},
+		off() {
+			let me = this;
+			if(me.autoTimer) {
+				clearInterval(me.autoTimer);
+				me.autoTimer = null;
+			}
+		},
+		next() {
+			this.nextPrev(DIR_NEXT);
+		},
+		prev() {
+			this.nextPrev(DIR_PREV);
+		},
+		nextPrev(dir) {
+			let me = this,
+				hasLoop = me.hasLoop,
+				rewind = me.rewind,
+				itemsLen = me.itemsLen,
+				lastItemIndex = itemsLen - 1,
+				activeIndex = me.activeIndex,
+				index;
 
-            if(dir == DIR_PREV) {
-                if(activeIndex == 0){
-                    if(hasLoop) {
-                        if(rewind) {
-                            index = lastItemIndex;
-                        }
-                        else {
-                            index = -1;
-                        }
-                    }
-                    else {
-                        return;
-                    }
-                }
-                else {
-                    index = activeIndex - 1;
-                }
-            }
-            //next
-            else {
-                if(activeIndex == itemsLen - 1){
-                    if(hasLoop) {
-                        if(rewind) {
-                            index = 0
-                        }
-                        else {
-                            index = itemsLen;
-                        }
-                    }
-                    else {
-                        return;
-                    }
-                }
-                else {
-                    index = activeIndex + 1;
-                }
-            }
-            me.to(index);
-        },
-        to(index) {
-            let me = this,
-                hasLoop = me.hasLoop,
-                itemsLen = me.itemsLen,
-                slideCount = me.slideCount,
-                rewind = me.rewind,
-                lastItemIndex = itemsLen - 1,
+			if(dir == DIR_PREV) {
+				if(activeIndex == 0){
+					if(hasLoop) {
+						if(rewind) {
+							index = lastItemIndex;
+						}
+						else {
+							index = -1;
+						}
+					}
+					else {
+						return;
+					}
+				}
+				else {
+					index = activeIndex - 1;
+				}
+			}
+			//next
+			else {
+				if(activeIndex == itemsLen - 1){
+					if(hasLoop) {
+						if(rewind) {
+							index = 0
+						}
+						else {
+							index = itemsLen;
+						}
+					}
+					else {
+						return;
+					}
+				}
+				else {
+					index = activeIndex + 1;
+				}
+			}
+			me.to(index);
+		},
+		to(index) {
+			let me = this,
+				hasLoop = me.hasLoop,
+				itemsLen = me.itemsLen,
+				slideCount = me.slideCount,
+				rewind = me.rewind,
+				lastItemIndex = itemsLen - 1,
 
-                removeAnimation = me.rmAnim,
-                addAnimation = me.addAnim,
-                go = me.to,
+				removeAnimation = me.rmAnim,
+				addAnimation = me.addAnim,
+				go = me.to,
 
-                onSlideEnd = null,
-                realIndex,
-                left;
-                
-            if(hasLoop){
-                if(index == -1){
-                    onSlideEnd = function() {
-                        removeAnimation();
-                        go(lastItemIndex);
-                        addAnimation();
-                    };
-                }
-                else if(index == itemsLen){
-                    onSlideEnd = function() {
-                        removeAnimation();
-                        go(0);
-                        addAnimation();
-                    };
-                }
+				onSlideEnd = null,
+				realIndex,
+				left;
+				
+			if(hasLoop){
+				if(index == -1){
+					onSlideEnd = function() {
+						removeAnimation();
+						go(lastItemIndex);
+						addAnimation();
+					};
+				}
+				else if(index == itemsLen){
+					onSlideEnd = function() {
+						removeAnimation();
+						go(0);
+						addAnimation();
+					};
+				}
 
-                realIndex = !rewind ? index + 1 : index;
-            }
-            else {
-                realIndex = index;
-            }
+				realIndex = !rewind ? index + 1 : index;
+			}
+			else {
+				realIndex = index;
+			}
 
-            left = realIndex * -100 / slideCount;
+			left = realIndex * -100 / slideCount;
 
-            if(!onSlideEnd) {
-                if(me.animPaused) {
-                    me.activeIndex = index;
-                }
-                else {
-                    onSlideEnd = function(){
-                        me.activeIndex = index;
-                    };
-                }
-            }
+			if(!onSlideEnd) {
+				if(me.animPaused) {
+					me.activeIndex = index;
+				}
+				else {
+					onSlideEnd = function(){
+						me.activeIndex = index;
+					};
+				}
+			}
 
-            me.transEndCB = onSlideEnd;
-            me.transTo(left);
-        },
-        checkTrans(){
-            let me = this,
-                transEndCB = me.transEndCB;
-            //only fire once
-            if(transEndCB){
-                transEndCB();
-                me.transEndCB = null;
-            }
-        },
-        transTo(moveTo) {
-            doCSS(this.itemsWrap, PROP_TRANSFORM, `translate3d(${moveTo}%,0,0)`);
-        },
-        startCB(e) {
-            let me = this,
-                $el = me.$el,
+			me.transEndCB = onSlideEnd;
+			me.transTo(left);
+		},
+		checkTrans(){
+			let me = this,
+				transEndCB = me.transEndCB;
+			//only fire once
+			if(transEndCB){
+				transEndCB();
+				me.transEndCB = null;
+			}
+		},
+		transTo(moveTo) {
+			doCSS(this.itemsWrap, PROP_TRANSFORM, `translate3d(${moveTo}%,0,0)`);
+		},
+		startCB(e) {
+			let me = this,
+				$el = me.$el,
 
-                getEventData = me.getEv,
-                removeAnimation = me.rmAnim,
-                addAnimation = me.addAnim,
-                transTo = me.transTo,
-                getPercent = me.getPercent,
+				getEventData = me.getEv,
+				removeAnimation = me.rmAnim,
+				addAnimation = me.addAnim,
+				transTo = me.transTo,
+				getPercent = me.getPercent,
 
-                data = getEventData(e),
-                
-                start = {
-                    time: +new Date,
-                    coords: [
-                        data.pageX,
-                        data.pageY
-                    ],
-                    origin: $el,
-                    interacting: false
-                },
-                stop, deltaX, deltaY,
+				data = getEventData(e),
+				
+				start = {
+					time: +new Date,
+					coords: [
+						data.pageX,
+						data.pageY
+					],
+					origin: $el,
+					interacting: false
+				},
+				stop, deltaX, deltaY,
 
-                $itemsWrap = me.itemsWrap,
-                elWidth = getWidth($el),
-                currentPos = getCurrentPos($itemsWrap);
+				$itemsWrap = me.itemsWrap,
+				elWidth = getWidth($el),
+				currentPos = getCurrentPos($itemsWrap);
 
-            removeAnimation();
+			removeAnimation();
 
-            function getCurrentPos($itemsWrap) {
-                return getAttr($itemsWrap, 'style') != undefined ? getPercent($itemsWrap) : 0;
-            }
+			function getCurrentPos($itemsWrap) {
+				return getAttr($itemsWrap, 'style') != undefined ? getPercent($itemsWrap) : 0;
+			}
 
-            function moveHandler(e) {
-                let data = getEventData(e);
-                stop = {
-                    time: +new Date,
-                    coords: [
-                        data.pageX,
-                        data.pageY
-                    ]
-                };
-                deltaX = Math.abs(start.coords[0] - data.pageX);
-                deltaY = Math.abs(start.coords[1] - data.pageY);
+			function moveHandler(e) {
+				let data = getEventData(e);
+				stop = {
+					time: +new Date,
+					coords: [
+						data.pageX,
+						data.pageY
+					]
+				};
+				deltaX = Math.abs(start.coords[0] - data.pageX);
+				deltaY = Math.abs(start.coords[1] - data.pageY);
 
-                //move threashold
-                if (!start || deltaX < deltaY || deltaY > 10 || deltaX < 3) {
-                    return;
-                }
+				//move threashold
+				if (!start || deltaX < deltaY || deltaY > 10 || deltaX < 3) {
+					return;
+				}
 
 
-                // prevent scrolling
-                if (deltaX >= 3) {
-                    start.interacting = true;
-                    let percent = currentPos + (((stop.coords[0] - start.coords[0]) / elWidth) * 100 / me.slideCount);
-                    transTo(percent);
-                    e.preventDefault();
-                }               
-            }
+				// prevent scrolling
+				if (deltaX >= 3) {
+					start.interacting = true;
+					let percent = currentPos + (((stop.coords[0] - start.coords[0]) / elWidth) * 100 / me.slideCount);
+					transTo(percent);
+					e.preventDefault();
+				}				
+			}
 
-            function snapback($itemsWrap, left) {
-                let slideCount = me.slideCount,
-                    currentPos = getCurrentPos($itemsWrap) * slideCount,
-                    percent = (left ? roundUp(currentPos) : roundDown(currentPos)) / slideCount;
+			function snapback($itemsWrap, left) {
+				let slideCount = me.slideCount,
+					currentPos = getCurrentPos($itemsWrap) * slideCount,
+					percent = (left ? roundUp(currentPos) : roundDown(currentPos)) / slideCount;
 
-                transTo(percent);
-            }
+				transTo(percent);
+			}
 
-            function dragsnap(dir){
-                me.nextPrev(dir);
-            }
+			function dragsnap(dir){
+				me.nextPrev(dir);
+			}
 
-            bindEvent($itemsWrap, EV_MOVE, moveHandler);
-            oneEvent($itemsWrap, EV_END, function(e) {
-                let activeIndex = me.activeIndex;
-                unbindEvent($itemsWrap, EV_MOVE, moveHandler);
+			bindEvent($itemsWrap, EV_MOVE, moveHandler);
+			oneEvent($itemsWrap, EV_END, function(e) {
+				let activeIndex = me.activeIndex;
+				unbindEvent($itemsWrap, EV_MOVE, moveHandler);
 
-                addAnimation();
+				addAnimation();
 
-                if(start && stop) {
-                    let deltaX = Math.abs(start.coords[0] - stop.coords[0]),
-                        deltaY = Math.abs(start.coords[1] - stop.coords[1]),
-                        left = start.coords[0] > stop.coords[0],
-                        jumppoint;
+				if(start && stop) {
+					let deltaX = Math.abs(start.coords[0] - stop.coords[0]),
+						deltaY = Math.abs(start.coords[1] - stop.coords[1]),
+						left = start.coords[0] > stop.coords[0],
+						jumppoint;
 
-                    //move threashold
-                    if(deltaX > 20 && (deltaX > deltaY)) {
-                        e.preventDefault();
-                    }
-                    else {
-                        if(start.interacting) {
-                            snapback($itemsWrap, left);
-                        }
-                        return;
-                    }
+					//move threashold
+					if(deltaX > 20 && (deltaX > deltaY)) {
+						e.preventDefault();
+					}
+					else {
+						if(start.interacting) {
+							snapback($itemsWrap, left);
+						}
+						return;
+					}
 
-                    jumppoint = elWidth / 4;
+					jumppoint = elWidth / 4;
 
-                    if(deltaX > jumppoint && (me.hasLoop && !me.rewind || !left && activeIndex > 0 || left && activeIndex < me.itemsLen - 1)) {
-                        dragsnap(left ? DIR_NEXT : DIR_PREV);
-                    }
-                    else {
-                        snapback($itemsWrap, left)
-                    }
-                }
-                start = stop = undefined;
-            });
-        },
-        getEv(e) {
-            let obj;
-            if (e.targetTouches) {
-                obj = e.targetTouches[0];
-            }
-            else {
-                obj = e;
-            }
+					if(deltaX > jumppoint && (me.hasLoop && !me.rewind || !left && activeIndex > 0 || left && activeIndex < me.itemsLen - 1)) {
+						dragsnap(left ? DIR_NEXT : DIR_PREV);
+					}
+					else {
+						snapback($itemsWrap, left)
+					}
+				}
+				start = stop = undefined;
+			});
+		},
+		getEv(e) {
+			let obj;
+			if (e.targetTouches) {
+				obj = e.targetTouches[0];
+			}
+			else {
+				obj = e;
+			}
 
-            return obj;
-        },
-        getPercent(element) {
-            return getAttr(element, 'style').match(/transform:.*translate3d.*\((.*[0-9].*)%/i) && parseFloat(RegExp.$1);
-        },
-        //Account for iOS safari rounding problems
-        adjRound() {
-            let me = this,
-                $el = me.$el,
-                $items = me.items,
-                diff = getWidth($el) - getWidth($items[0]);
+			return obj;
+		},
+		getPercent(element) {
+			return getAttr(element, 'style').match(/transform:.*translate3d.*\((.*[0-9].*)%/i) && parseFloat(RegExp.$1);
+		},
+		//Account for iOS safari rounding problems
+		adjRound() {
+			let me = this,
+				$el = me.$el,
+				$items = me.items,
+				diff = getWidth($el) - getWidth($items[0]);
 
-            if(diff !== 0) {
-                each($items, function(element) {
-                    doCSS(element, 'position', 'relative');
-                    doCSS(element, 'left', (diff * i) + 'px');
-                });
-            }
-        }
-    }
+			if(diff !== 0) {
+				each($items, function(element) {
+					doCSS(element, 'position', 'relative');
+					doCSS(element, 'left', (diff * i) + 'px');
+				});
+			}
+		}
+	}
 }
+
 </script>
