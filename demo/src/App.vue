@@ -1,108 +1,108 @@
 <style lang="less">
 .v-carousel-item {
-    height: 100px;
+	height: 100px;
 }
 </style>
 <template>
-    <div id="app">
-        <h3>Vue Carousel Example</h3>
-        <carousel ref="car" @changed-index="log" @render-updated="log('render-updated')" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind">
-            <carousel-item v-for="(item, index) in list">
-                <p>CarouselItem{{index}}, URL is {{item.url}}</p>
-            </carousel-item>
-        </carousel>
-        <div>
-            <button @click="toggleAuto()">toggle auto: {{auto}}</button>
-            <button @click="toggleLoop()">toggle loop: {{loop}}</button>
-            <button @click="toggleRewind()">toggle rewind: {{rewind}}</button>
-            <button @click="changeList()">change list</button>
-        </div>
-        <div>
-            <button @click="$refs.car.$emit('prev')">Prev slide</button>
-            <button @click="$refs.car.$emit('next')">Next slide</button>
-        </div>
-        <div>
-            <label>Goto:</label>
-            <input type="number" @input="to" value="0">
-        </div>
-    </div>
+	<div id="app">
+		<h3>Vue Carousel Example</h3>
+		<carousel ref="car" @changed-index="log" @render-updated="log('render-updated')" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind">
+			<carousel-item v-for="(item, index) in list">
+				<p>CarouselItem{{index}}, URL is {{item.url}}</p>
+			</carousel-item>
+		</carousel>
+		<div>
+			<button @click="toggleAuto()">toggle auto: {{auto}}</button>
+			<button @click="toggleLoop()">toggle loop: {{loop}}</button>
+			<button @click="toggleRewind()">toggle rewind: {{rewind}}</button>
+			<button @click="changeList()">change list</button>
+		</div>
+		<div>
+			<button @click="$refs.car.$emit('prev')">Prev slide</button>
+			<button @click="$refs.car.$emit('next')">Next slide</button>
+		</div>
+		<div>
+			<label>Goto:</label>
+			<input type="number" @input="to" value="0">
+		</div>
+	</div>
 </template>
 <script>
 import Carousel from '../../src/Carousel'
 import CarouselItem from '../../src/CarouselItem'
 
 var list1 = [
-    {
-        url: 'url1'
-    },
-    {
-        url: 'url2'
-    },
-    {
-        url: 'url3'
-    }
+	{
+		url: 'url1'
+	},
+	{
+		url: 'url2'
+	},
+	{
+		url: 'url3'
+	}
 ],
-    list2 = [
-    {
-        url: 'url4'
-    },
-    {
-        url: 'url5'
-    },
-    {
-        url: 'url6'
-    },
-    {
-        url: 'url7'
-    }
+	list2 = [
+	{
+		url: 'url4'
+	},
+	{
+		url: 'url5'
+	},
+	{
+		url: 'url6'
+	},
+	{
+		url: 'url7'
+	}
 ],
-    log = console.log;
+	log = console.log;
 
 export default {
-    components: {
-        'carousel': Carousel,
-        'carousel-item': CarouselItem
-    },
-    data() {
-        return {
-            auto: 0,
-            list: list1,
-            speed: 300,
-            loop: true,
-            rewind: false
-        };
-    },
-    mounted() {
-        var me = this;
-        me.$on('v-carousel', function(){
-            console.log(arguments);
-        });
-    },
-    methods: {
-        toggleAuto() {
-            this.auto = this.auto === 0 ? 3000 : 0;
-        },
-        toggleLoop() {
-            this.loop = !this.loop;
-        },
-        toggleRewind() {
-            this.rewind = !this.rewind;
-        },
-        log(content) {
-            log(content);
-        },
-        to(e) {
-            this.$refs.car.$emit('to', e.target.value);
-        },
-        indexChanged(index, total, item) {
-            var me = this,
-                log = me.log;
-            log('Slide end:' + index);
-            log(item);
-        },
-        changeList() {
-            this.list = this.list == list1 ? list2 : list1;
-        }
-    }
+	components: {
+		'carousel': Carousel,
+		'carousel-item': CarouselItem
+	},
+	data() {
+		return {
+			auto: 0,
+			list: list1,
+			speed: 300,
+			loop: true,
+			rewind: false
+		};
+	},
+	mounted() {
+		var me = this;
+		me.$on('v-carousel', function(){
+			console.log(arguments);
+		});
+	},
+	methods: {
+		toggleAuto() {
+			this.auto = this.auto === 0 ? 3000 : 0;
+		},
+		toggleLoop() {
+			this.loop = !this.loop;
+		},
+		toggleRewind() {
+			this.rewind = !this.rewind;
+		},
+		log(content) {
+			log(content);
+		},
+		to(e) {
+			this.$refs.car.$emit('to', e.target.value);
+		},
+		indexChanged(index, total, item) {
+			var me = this,
+				log = me.log;
+			log('Slide end:' + index);
+			log(item);
+		},
+		changeList() {
+			this.list = this.list == list1 ? list2 : list1;
+		}
+	}
 };
 </script>

@@ -641,30 +641,29 @@ export default {
 
 				addAnimation();
 
-				if(start && stop) {
-					let deltaX = Math.abs(start.coords[0] - stop.coords[0]),
+				if (start && stop) {
+					const deltaX = Math.abs(start.coords[0] - stop.coords[0]),
 						deltaY = Math.abs(start.coords[1] - stop.coords[1]),
 						left = start.coords[0] > stop.coords[0],
-						jumppoint;
+						jumppoint = elWidth / 4;
 
 					//move threashold
-					if(deltaX > 20 && (deltaX > deltaY)) {
+					if (deltaX > 20 && (deltaX > deltaY)) {
 						e.preventDefault();
-					}
-					else {
-						if(start.interacting) {
+					} else {
+						if (start.interacting) {
 							snapback($itemsWrap, left);
 						}
 						return;
 					}
 
-					jumppoint = elWidth / 4;
-
-					if(deltaX > jumppoint && (me.hasLoop && !me.rewind || !left && activeIndex > 0 || left && activeIndex < me.itemsLen - 1)) {
+					if ((deltaX > jumppoint)
+						&& ((me.hasLoop && !me.rewind)
+							|| (!left && activeIndex > 0)
+							|| (left && activeIndex < me.itemsLen - 1))) {
 						dragsnap(left ? DIR_NEXT : DIR_PREV);
-					}
-					else {
-						snapback($itemsWrap, left)
+					} else {
+						snapback($itemsWrap, left);
 					}
 				}
 				start = stop = undefined;
@@ -674,8 +673,7 @@ export default {
 			let obj;
 			if (e.targetTouches) {
 				obj = e.targetTouches[0];
-			}
-			else {
+			} else {
 				obj = e;
 			}
 
@@ -684,21 +682,21 @@ export default {
 		getPercent(element) {
 			return getAttr(element, 'style').match(/transform:.*translate3d.*\((.*[0-9].*)%/i) && parseFloat(RegExp.$1);
 		},
-		//Account for iOS safari rounding problems
+		// Account for iOS safari rounding problems
 		adjRound() {
-			let me = this,
+			const me = this,
 				$el = me.$el,
 				$items = me.items,
 				diff = getWidth($el) - getWidth($items[0]);
 
-			if(diff !== 0) {
-				each($items, function(element) {
+			if (diff !== 0) {
+				each($items, (element, i) => {
 					doCSS(element, 'position', 'relative');
-					doCSS(element, 'left', (diff * i) + 'px');
+					doCSS(element, 'left', `${diff * i}px`);
 				});
 			}
-		}
-	}
-}
+		},
+	},
+};
 
 </script>
