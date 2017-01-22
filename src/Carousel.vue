@@ -86,7 +86,7 @@ const win = window,
 	DIR_PREV = 'prev',
 	DIR_NEXT = 'next',
 
-	//unable to detect the exact event
+	// unable to detect the exact event
 	EV_TRANSITION_END = ['transitionend','OTransitionEnd','webkitTransitionEnd'],
 
 	EV_TOUCH_START = 'touchstart',
@@ -102,7 +102,7 @@ const win = window,
 
 	EV_RESIZE = 'resize',
 
-	//Custom events
+	// Custom events
 	EV_CHANGED_INDEX = 'changed-index',
 	EV_RENDER_UPDATED = 'render-updated',
 	EV_NEXT = 'next',
@@ -150,85 +150,85 @@ function round(oVal, method) {
 	return method(oVal / 100) * 100;
 }
 
-//named exports are not supported in *.vue files. Shoot!
+//named exports are not supported in *.vue files. Shoot! (╯°Д°)╯︵ ┻━┻
 //export {
 //	  Events
 //};
 
 export default {
 	props: {
-		//HTML content of the previous button.
+		// HTML content of the previous button.
 		prevHTML: {
 			type: String,
 			default: '&lt;'
 		},
-		//HTML content of the enext button.
+		// HTML content of the enext button.
 		nextHTML: {
 			type: String,
 			default: '&gt;'
 		},
-		//The time of the transition animation. In ms.
+		// The time of the transition animation. In ms.
 		speed: {
 			type: Number,
 			default: 300
 		},
-		//It can go to next/previous slide at the ends if it's set to true. It works only the items' length more than 1.
+		// It can go to next/previous slide at the ends if it's set to true. It works only the items' length more than 1.
 		loop: {
 			type: Boolean,
 			default: false
 		},
-		//Rewind to the other end instead of endless loop but you can only go to the other end by previous or next button, if it's set to true. It works only loop is set to true.
+		// Rewind to the other end instead of endless loop but you can only go to the other end by previous or next button, if it's set to true. It works only loop is set to true.
 		rewind: {
 			type: Boolean,
 			default: false
 		},
-		//It can be drag by mouse if it's set to true.
+		// It can be drag by mouse if it's set to true.
 		mouseDrag: {
 			type: Boolean,
 			default: false
 		},
-		//Autoplay interval. In ms. 0 for no autoplay.
+		// Autoplay interval. In ms. 0 for no autoplay.
 		auto: {
 			type: Number,
 			default: 0
 		},
-		//Pagination is available if it's set to true.
+		// Pagination is available if it's set to true.
 		dots: {
 			type: Boolean,
 			default: true
 		},
-		//Style of v-carousel-dots
+		// Style of v-carousel-dots
 		dotsStyle: {
 			type: [Object, String, Array],
 			default: ''
 		},
-		//The original data list used to render the CarouselItems. The component will rerender if this property changes.
+		// The original data list used to render the CarouselItems. The component will rerender if this property changes.
 		watchItems: {
 			type: Array,
 			default() {
 				return [];
 			}
-		}
+		},
 	},
 	data() {
 		return {
-			//It seems that key with symbols can't be accessced directly from vm.
+			// It seems that key with symbols can't be accessced directly from vm.
 			activeIndex: 0,
 			animPaused: true,
 			itemsLen: 0,
 			slideCount: 0,
 			hasLoop: false,
 			autoTimer: null,
-			//Nodes
+			// Nodes
 			cloneItems: [],
 			items: null,
 			itemsWrap: null,
-			//Callbacks
-			transEndCB: null
+			// Callbacks
+			transEndCB: null,
 		};
 	},
 	mounted() {
-		let me = this,
+		const me = this,
 
 			$el = me.$el,
 			$itemsWrap = findNodes($el, '.v-carousel-items')[0],
@@ -288,9 +288,9 @@ export default {
 		bindEvent(win, EV_RESIZE, adjRound);
 		bindEvent($itemsWrap, EV_TRANSITION_END, me.checkTrans);
 	},
-	//Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
+	// Although "updated" can be used to detect content changes, it'll bring too many changes which are not I want. So use $watch instead.
 	destroyed() {
-		let me = this,
+		const me = this,
 			$itemsWrap = me.itemsWrap;
 		unbindEvent(win, EV_RESIZE, me.adjRound);
 		me.unbindDrag();
@@ -310,8 +310,8 @@ export default {
 				$itemsWrap = me.itemsWrap,
 				$cloneItems = me.cloneItems;
 
-			//clean up
-			if($cloneItems.length > 0){
+			// clean up
+			if ($cloneItems.length > 0) {
 				each($cloneItems, function($item){
 					removeNode($item);
 				});
@@ -321,8 +321,8 @@ export default {
 
 			let $items = findNodes($itemsWrap, '.v-carousel-item');
 
-			//create cloned nodes
-			if(hasLoop && !rewind) {
+			// create cloned nodes
+			if (hasLoop && !rewind) {
 				let firstNode = $items[0],
 					lastNode = $items[itemsLen - 1],
 					firstNodeCloned = cloneNode(firstNode, true),
@@ -356,25 +356,25 @@ export default {
 			me.checkAuto();
 		},
 		reset() {
-			let me = this;
+			const me = this;
 			me.off();
 			me.to(0);
 		},
 		checkDrag() {
-			let me = this,
+			const me = this,
 				mouseDrag = me.mouseDrag;
 			me.unbindDrag();
 			if(hasTouch || mouseDrag){
-				//DragSnap support
+				// DragSnap support
 				bindEvent(me.itemsWrap, EV_START, me.startCB);
 			}
 		},
 		unbindDrag() {
-			let me = this;
+			const me = this;
 			unbindEvent(me.itemsWrap, EV_START, me.startCB);
 		},
 		checkAuto() {
-			let me = this,
+			const me = this,
 				auto = me.auto,
 
 				turnOff = me.off,
@@ -387,49 +387,46 @@ export default {
 			unbindEvent($itemsWrap, EV_START, turnOff);
 			unbindEvent($itemsWrap, EV_END, turnOn);
 
-			if(auto > 0) {
+			if (auto > 0) {
 				bindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
 				bindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
 				bindEvent($itemsWrap, EV_START, turnOff);
 				bindEvent($itemsWrap, EV_END, turnOn);
 				turnOn();
-			}
-			else {
+			} else {
 				turnOff();
 			}
 		},
 		rmAnim: function() {
 			let me = this,
 				$itemsWrap = me.itemsWrap;
-			//reset reset animation
+			// reset reset animation
 			doCSS($itemsWrap, PROP_TRANSITION, 'none');
 			me.animPaused = true;
 		},
 		addAnim: function() {
-			let me = this,
+			const me = this,
 				$itemsWrap = me.itemsWrap;
-			//Force to paint
+			// Force to paint
 			getOffset($itemsWrap);
 
 			doCSS($itemsWrap, PROP_TRANSITION, PROP_TRANSFORM + ' ' + (me.speed / 1000) + 's ease');
 			me.animPaused = false;
 		},
 		on() {
-			let me = this,
+			const me = this,
 				hasLoop = me.hasLoop,
 				itemsLen = me.itemsLen;
 			me.off();
-			if(itemsLen.length > 1){
+			if (itemsLen.length > 1) {
 				me.autoTimer = setInterval(function(){
-					if(!hasLoop){
-						if(me.activeIndex == itemsLen - 1){
+					if (!hasLoop) {
+						if (me.activeIndex == itemsLen - 1) {
 							me.to(0);
-						}
-						else {
+						} else {
 							me.next();
 						}
-					}
-					else {
+					} else {
 						me.next();
 					}
 				}, me.auto);
@@ -449,15 +446,15 @@ export default {
 			this.nextPrev(DIR_PREV);
 		},
 		nextPrev(dir) {
-			let me = this,
+			const me = this,
 				hasLoop = me.hasLoop,
 				rewind = me.rewind,
 				itemsLen = me.itemsLen,
 				lastItemIndex = itemsLen - 1,
-				activeIndex = me.activeIndex,
-				index;
+				activeIndex = me.activeIndex;
+			let index;
 
-			if(dir == DIR_PREV) {
+			if (dir == DIR_PREV) {
 				if(activeIndex == 0){
 					if(hasLoop) {
 						if(rewind) {
@@ -475,22 +472,20 @@ export default {
 					index = activeIndex - 1;
 				}
 			}
-			//next
+			// next
 			else {
-				if(activeIndex == itemsLen - 1){
-					if(hasLoop) {
+				if (activeIndex == itemsLen - 1) {
+					if (hasLoop) {
 						if(rewind) {
 							index = 0
 						}
 						else {
 							index = itemsLen;
 						}
-					}
-					else {
+					} else {
 						return;
 					}
-				}
-				else {
+				} else {
 					index = activeIndex + 1;
 				}
 			}
@@ -512,16 +507,15 @@ export default {
 				realIndex,
 				left;
 				
-			if(hasLoop){
-				if(index == -1){
+			if (hasLoop) {
+				if(index == -1) {
 					onSlideEnd = function() {
 						removeAnimation();
 						go(lastItemIndex);
 						addAnimation();
 					};
-				}
-				else if(index == itemsLen){
-					onSlideEnd = function() {
+				} else if(index == itemsLen) {
+					onSlideEnd = function () {
 						removeAnimation();
 						go(0);
 						addAnimation();
@@ -536,7 +530,7 @@ export default {
 
 			left = realIndex * -100 / slideCount;
 
-			if(!onSlideEnd) {
+			if (!onSlideEnd) {
 				if(me.animPaused) {
 					me.activeIndex = index;
 				}
@@ -550,11 +544,11 @@ export default {
 			me.transEndCB = onSlideEnd;
 			me.transTo(left);
 		},
-		checkTrans(){
-			let me = this,
+		checkTrans() {
+			const me = this,
 				transEndCB = me.transEndCB;
-			//only fire once
-			if(transEndCB){
+			// only fire once
+			if (transEndCB) {
 				transEndCB();
 				me.transEndCB = null;
 			}
@@ -563,7 +557,8 @@ export default {
 			doCSS(this.itemsWrap, PROP_TRANSFORM, `translate3d(${moveTo}%,0,0)`);
 		},
 		startCB(e) {
-			let me = this,
+			/* eslint no-use-before-define: 0 */
+			const me = this,
 				$el = me.$el,
 
 				getEventData = me.getEv,
@@ -573,21 +568,23 @@ export default {
 				getPercent = me.getPercent,
 
 				data = getEventData(e),
-				
-				start = {
-					time: +new Date,
-					coords: [
-						data.pageX,
-						data.pageY
-					],
-					origin: $el,
-					interacting: false
-				},
-				stop, deltaX, deltaY,
 
 				$itemsWrap = me.itemsWrap,
 				elWidth = getWidth($el),
 				currentPos = getCurrentPos($itemsWrap);
+
+			let start = {
+					time: +new Date(),
+					coords: [
+						data.pageX,
+						data.pageY,
+					],
+					origin: $el,
+					interacting: false,
+				},
+				stop,
+				deltaX,
+				deltaY;
 
 			removeAnimation();
 
@@ -596,18 +593,18 @@ export default {
 			}
 
 			function moveHandler(e) {
-				let data = getEventData(e);
+				const data = getEventData(e);
 				stop = {
-					time: +new Date,
+					time: +new Date(),
 					coords: [
 						data.pageX,
-						data.pageY
-					]
+						data.pageY,
+					],
 				};
 				deltaX = Math.abs(start.coords[0] - data.pageX);
 				deltaY = Math.abs(start.coords[1] - data.pageY);
 
-				//move threashold
+				// move threashold
 				if (!start || deltaX < deltaY || deltaY > 10 || deltaX < 3) {
 					return;
 				}
@@ -616,27 +613,28 @@ export default {
 				// prevent scrolling
 				if (deltaX >= 3) {
 					start.interacting = true;
-					let percent = currentPos + (((stop.coords[0] - start.coords[0]) / elWidth) * 100 / me.slideCount);
+					const percent = currentPos + ((stop.coords[0] - start.coords[0])
+						/ elWidth * 100 / me.slideCount);
 					transTo(percent);
 					e.preventDefault();
-				}				
+				}
 			}
 
 			function snapback($itemsWrap, left) {
-				let slideCount = me.slideCount,
+				const slideCount = me.slideCount,
 					currentPos = getCurrentPos($itemsWrap) * slideCount,
 					percent = (left ? roundUp(currentPos) : roundDown(currentPos)) / slideCount;
 
 				transTo(percent);
 			}
 
-			function dragsnap(dir){
+			function dragsnap(dir) {
 				me.nextPrev(dir);
 			}
 
 			bindEvent($itemsWrap, EV_MOVE, moveHandler);
-			oneEvent($itemsWrap, EV_END, function(e) {
-				let activeIndex = me.activeIndex;
+			oneEvent($itemsWrap, EV_END, (e) => {
+				const activeIndex = me.activeIndex;
 				unbindEvent($itemsWrap, EV_MOVE, moveHandler);
 
 				addAnimation();
@@ -647,7 +645,7 @@ export default {
 						left = start.coords[0] > stop.coords[0],
 						jumppoint = elWidth / 4;
 
-					//move threashold
+					// move threashold
 					if (deltaX > 20 && (deltaX > deltaY)) {
 						e.preventDefault();
 					} else {
@@ -657,10 +655,10 @@ export default {
 						return;
 					}
 
-					if ((deltaX > jumppoint)
-						&& ((me.hasLoop && !me.rewind)
-							|| (!left && activeIndex > 0)
-							|| (left && activeIndex < me.itemsLen - 1))) {
+					if (deltaX > jumppoint
+						&& (me.hasLoop && !me.rewind
+							|| !left && activeIndex > 0
+							|| left && activeIndex < me.itemsLen - 1)) {
 						dragsnap(left ? DIR_NEXT : DIR_PREV);
 					} else {
 						snapback($itemsWrap, left);
