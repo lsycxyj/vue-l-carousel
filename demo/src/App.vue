@@ -10,6 +10,8 @@
 			<carousel-item v-for="(item, index) in list">
 				<p>CarouselItem{{index}}, URL is {{item.url}}</p>
 			</carousel-item>
+			<div slot="before">Insert node before</div>
+			<div slot="after">Insert node after</div>
 		</carousel>
 		<div>
 			<button @click="toggleAuto()">toggle auto: {{auto}}</button>

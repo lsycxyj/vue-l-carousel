@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "webpack --config ./build/webpack.dev.conf.js --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "karma start test/unit/karma.conf.js --single-run"
   },
   "repository": {
     "type": "git",
@@ -47,8 +47,19 @@
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-react": "^6.9.0",
     "file-loader": "^0.9.0",
+    "isparta": "^4.0.0",
+    "isparta-loader": "^2.0.0",
+    "jasmine": "^2.5.3",
+    "karma": "^1.4.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-coverage": "^1.1.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^2.0.1",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
+    "phantomjs-prebuilt": "^2.1.14",
     "url-loader": "^0.5.7",
     "vue-loader": "^10.0.0",
     "vue-style-loader": "^1.0.0",
