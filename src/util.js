@@ -61,7 +61,8 @@ function each(elements, callback) {
 function on(element, ev, callback) {
 	if (isStr(ev)) {
 		element.addEventListener(ev, callback);
-	} else if (isArr(ev)) {
+	}
+	else if (isArr(ev)) {
 		each(ev, e => on(element, e, callback));
 	}
 }
@@ -69,7 +70,8 @@ function on(element, ev, callback) {
 function off(element, ev, callback) {
 	if (isStr(ev)) {
 		element.removeEventListener(ev, callback);
-	} else if (isArr(ev)) {
+	}
+	else if (isArr(ev)) {
 		each(ev, e => on(element, e, callback));
 	}
 }
@@ -99,7 +101,8 @@ function prepend(element, target) {
 	const childNodes = children(element);
 	if (childNodes.length > 0) {
 		element.insertBefore(target, childNodes[0]);
-	} else {
+	}
+	else {
 		append(element, target);
 	}
 }
@@ -140,9 +143,11 @@ function css(element, property, value) {
 	const elementSytle = element.style;
 	if (arguments.length < 3) {
 		return elementSytle[camelize(property)] || getComputedStyle(element, '').getPropertyValue(property);
-	} else if (!value && value !== 0) {
+	}
+	else if (!value && value !== 0) {
 		elementSytle.removeProperty(dasherize(property));
-	} else {
+	}
+	else {
 		elementSytle[dasherize(property)] = maybeAddPx(property, value);
 	}
 }
