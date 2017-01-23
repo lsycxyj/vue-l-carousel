@@ -1,7 +1,8 @@
 var path = require('path'),
 	config = require('./conf');
 var projectRoot = path.resolve(__dirname, '../'),
-	projectSrc = path.resolve(projectRoot, 'src');
+	projectSrc = path.resolve(projectRoot, 'src'),
+	projectDemo = path.resolve(projectRoot, 'demo');
 
 module.exports = {
 	entry: {
@@ -48,7 +49,10 @@ module.exports = {
 			{
 				test: /\.js$/,
 				loader: 'babel-loader',
-				include: [projectRoot],
+				include: [
+					projectSrc,
+					projectDemo
+				],
 				exclude: /node_modules/
 			}
 		]

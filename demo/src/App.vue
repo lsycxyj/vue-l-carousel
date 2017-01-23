@@ -30,8 +30,7 @@
 	</div>
 </template>
 <script>
-import Carousel from '../../src/Carousel'
-import CarouselItem from '../../src/CarouselItem'
+import { Carousel, CarouselItem } from '../../src/index';
 
 var list1 = [
 	{

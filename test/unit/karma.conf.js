@@ -23,8 +23,8 @@ delete webpackConfig.entry;
 // Use babel for test files too
 webpackConfig.module.loaders.some(function (loader, i) {
 	if (/^babel(-loader)?$/.test(loader.loader)) {
-		loader.include.push(path.resolve(projectRoot, 'test/unit'))
-		return true
+		loader.include.push(path.resolve(projectRoot, 'test/unit'));
+		return true;
 	}
 });
 
@@ -60,7 +60,7 @@ module.exports = function (config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ['progress', 'coverage'],
+		reporters: ['spec', 'coverage'],
 
 		// webpack
 		webpack: webpackConfig,
@@ -105,5 +105,5 @@ module.exports = function (config) {
 		// Concurrency level
 		// how many browser should be started simultaneous
 		concurrency: Infinity
-	})
+	});
 };
