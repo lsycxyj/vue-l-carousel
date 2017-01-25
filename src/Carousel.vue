@@ -439,7 +439,7 @@ export default {
 				hasLoop = me.hasLoop,
 				itemsLen = me.itemsLen;
 			me.off();
-			if (itemsLen.length > 1) {
+			if (itemsLen > 1) {
 				me.autoTimer = setInterval(() => {
 					if (!hasLoop) {
 						if (me.activeIndex == itemsLen - 1) {
@@ -708,7 +708,7 @@ export default {
 			const me = this,
 				$el = me.$el,
 				$items = me.items,
-				diff = getWidth($el) - getWidth($items[0]);
+				diff = $items && $items.length > 0 ? getWidth($el) - getWidth($items[0]) : 0;
 
 			if (diff !== 0) {
 				each($items, (element, i) => {

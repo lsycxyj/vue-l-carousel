@@ -66,7 +66,7 @@ export default {
 	},
 	data() {
 		return {
-			auto: 0,
+			auto: 3000,
 			list: list1,
 			speed: 300,
 			loop: true,
@@ -74,8 +74,9 @@ export default {
 		};
 	},
 	mounted() {
-		var me = this;
-		me.$on('v-carousel', function(){
+		var me = this,
+			car = me.$refs.car;
+		car.$on('changed-index', function(){
 			console.log(arguments);
 		});
 	},
