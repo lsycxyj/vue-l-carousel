@@ -8,5 +8,12 @@
     "syntax-async-functions",
     "transform-regenerator"
   ],
-  "comments": false
+  "comments": false,
+  "env": {
+    "test": {
+      "plugins": [
+        "istanbul"
+      ]
+    }
+  }
 }

@@ -14,7 +14,12 @@ var webpackConfig = merge(baseConfig, {
 		loaders: {
 			js: 'babel-loader'
 		}
-	}
+	},
+	plugins: [
+		new webpack.DefinePlugin({
+			'process.env': require('../../config/test.env')
+		})
+	]
 });
 
 // no need for app entry during tests
@@ -60,6 +65,7 @@ module.exports = function (config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
+		// add coverage support with babel's test plugins
 		reporters: ['spec', 'coverage'],
 
 		// webpack

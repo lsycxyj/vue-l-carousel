@@ -61,9 +61,6 @@ module.exports = {
 		formatter: require('eslint-friendly-formatter')
 	},
 	vue: {
-		//loaders: {
-		//	js: 'isparta-loader'
-		//},
 		postcss: [
 			require('autoprefixer')({
 				browsers: ['last 2 versions']
