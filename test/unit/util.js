@@ -56,21 +56,22 @@ function createVirtualPointer() {
 		trigger(evtName) {
 			const x = this.x,
 				y = this.y;
+			// TODO: I haven't found a good way to simulate touch events
 			simulant.fire(document.elementFromPoint(x, y), evtName, {
 				clientX: x,
 				clientY: y,
-				//pageX: x,
-				//pageY: y,
-				//touches: [
-				//	{
-				//		pageX: x,
-				//		pageY: y,
-				//	}
-				//],
-				//targetTouches: [{
-				//	pageX: x,
-				//	pageY: y,
-				//}],
+				pageX: x,
+				pageY: y,
+				touches: [
+					{
+						pageX: x,
+						pageY: y,
+					}
+				],
+				targetTouches: [{
+					pageX: x,
+					pageY: y,
+				}],
 			});
 			//$(document.elementFromPoint(x, y)).trigger($.Event(evtName, {
 			//	pageX: x,

@@ -108,7 +108,7 @@ const win = window,
 	EV_RENDER_UPDATED = 'render-updated',
 	EV_NEXT = 'next',
 	EV_PREV = 'prev',
-	EV_TO = 'to',
+	EV_TO = 'to';
 
 	/*
 	Events = {
@@ -119,10 +119,6 @@ const win = window,
 		  EV_TO
 	},
 	*/
-
-	EV_START = hasTouch ? EV_TOUCH_START : EV_MOUSE_DOWN,
-	EV_MOVE = hasTouch ? EV_TOUCH_MOVE : EV_MOUSE_MOVE,
-	EV_END = hasTouch ? EV_TOUCH_END : EV_MOUSE_UP;
 
 const findNodes = $.qsa,
 	bindEvent = $.on,
@@ -382,16 +378,33 @@ export default {
 		},
 		checkDrag() {
 			const me = this,
-				mouseDrag = me.mouseDrag;
+				mouseDrag = me.mouseDrag,
+				itemsWrap = me.itemsWrap,
+				startCB = me.startCB,
+
+				EV_MOVE = [],
+				EV_END = [];
 			me.unbindDrag();
-			if (hasTouch || mouseDrag) {
+
+			if (mouseDrag) {
 				// DragSnap support
-				bindEvent(me.itemsWrap, EV_START, me.startCB);
+				bindEvent(itemsWrap, EV_MOUSE_DOWN, startCB);
+				EV_MOVE.push(EV_MOUSE_MOVE);
+				EV_END.push(EV_MOUSE_UP);
 			}
+
+			if (hasTouch) {
+				bindEvent(itemsWrap, EV_TOUCH_START, startCB);
+				EV_MOVE.push(EV_TOUCH_MOVE);
+				EV_END.push(EV_TOUCH_END);
+			}
+
+			me.EV_MOVE = EV_MOVE;
+			me.EV_END = EV_END;
 		},
 		unbindDrag() {
 			const me = this;
-			unbindEvent(me.itemsWrap, EV_START, me.startCB);
+			unbindEvent(me.itemsWrap, [EV_TOUCH_START, EV_MOUSE_DOWN], me.startCB);
 		},
 		checkAuto() {
 			const me = this,
@@ -404,18 +417,17 @@ export default {
 
 			unbindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
 			unbindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
-			unbindEvent($itemsWrap, EV_START, turnOff);
-			unbindEvent($itemsWrap, EV_END, turnOn);
+			unbindEvent($itemsWrap, [EV_TOUCH_START, EV_MOUSE_DOWN], turnOff);
+			unbindEvent($itemsWrap, [EV_TOUCH_END, EV_MOUSE_UP], turnOn);
+
+			turnOff();
 
 			if (auto > 0) {
 				bindEvent($itemsWrap, EV_MOUSE_ENTER, turnOff);
 				bindEvent($itemsWrap, EV_MOUSE_LEAVE, turnOn);
-				bindEvent($itemsWrap, EV_START, turnOff);
-				bindEvent($itemsWrap, EV_END, turnOn);
+				bindEvent($itemsWrap, [EV_TOUCH_START, EV_MOUSE_DOWN], turnOff);
+				bindEvent($itemsWrap, [EV_TOUCH_END, EV_MOUSE_UP], turnOn);
 				turnOn();
-			}
-			else {
-				turnOff();
 			}
 		},
 		rmAnim() {
@@ -437,9 +449,10 @@ export default {
 		on() {
 			const me = this,
 				hasLoop = me.hasLoop,
-				itemsLen = me.itemsLen;
+				itemsLen = me.itemsLen,
+				auto = me.auto;
 			me.off();
-			if (itemsLen > 1) {
+			if (itemsLen > 1 && auto > 0) {
 				me.autoTimer = setInterval(() => {
 					if (!hasLoop) {
 						if (me.activeIndex == itemsLen - 1) {
@@ -452,7 +465,7 @@ export default {
 					else {
 						me.next();
 					}
-				}, me.auto);
+				}, auto);
 			}
 		},
 		off() {
@@ -581,6 +594,9 @@ export default {
 			const me = this,
 				$el = me.$el,
 
+				EV_MOVE = me.EV_MOVE,
+				EV_END = me.EV_END,
+
 				getEventData = me.getEv,
 				removeAnimation = me.rmAnim,
 				addAnimation = me.addAnim,
@@ -594,7 +610,7 @@ export default {
 				currentPos = getCurrentPos($itemsWrap);
 
 			let start = {
-					time: +new Date(),
+					time: Date.now(),
 					coords: [
 						data.pageX,
 						data.pageY,
@@ -613,19 +629,22 @@ export default {
 			}
 
 			function moveHandler(e) {
-				const data = getEventData(e);
+				if (!start) return;
+
+				const d = getEventData(e);
 				stop = {
-					time: +new Date(),
+					time: Date.now(),
 					coords: [
-						data.pageX,
-						data.pageY,
+						d.pageX,
+						d.pageY,
 					],
 				};
-				deltaX = Math.abs(start.coords[0] - data.pageX);
-				deltaY = Math.abs(start.coords[1] - data.pageY);
+
+				deltaX = Math.abs(start.coords[0] - stop.coords[0]);
+				deltaY = Math.abs(start.coords[1] - stop.coords[1]);
 
 				// move threashold
-				if (!start || deltaX < deltaY || deltaY > 10 || deltaX < 3) {
+				if (deltaX < deltaY || deltaY > 10 || deltaX < 3) {
 					return;
 				}
 
@@ -686,7 +705,7 @@ export default {
 						snapback($itemsWrap, left);
 					}
 				}
-				start = stop = undefined;
+				start = stop = null;
 			});
 		},
 		getEv(e) {

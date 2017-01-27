@@ -6,7 +6,7 @@
 <template>
 	<div id="app">
 		<h3>Vue Carousel Example</h3>
-		<carousel ref="car" @changed-index="log" @render-updated="log('render-updated')" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind" mouseDrag="true">
+		<carousel ref="car" @changed-index="log" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind" :mouseDrag="true">
 			<carousel-item v-for="(item, index) in list">
 				<p>CarouselItem{{index}}, URL is {{item.url}}</p>
 			</carousel-item>
@@ -56,8 +56,7 @@ var list1 = [
 	{
 		url: 'url7'
 	}
-],
-	log = console.log;
+];
 
 export default {
 	components: {
@@ -66,7 +65,7 @@ export default {
 	},
 	data() {
 		return {
-			auto: 3000,
+			auto: 30000,
 			list: list1,
 			speed: 300,
 			loop: true,
@@ -91,7 +90,7 @@ export default {
 			this.rewind = !this.rewind;
 		},
 		log(content) {
-			log(content);
+			console.log(content);
 		},
 		to(e) {
 			this.$refs.car.$emit('to', e.target.value);

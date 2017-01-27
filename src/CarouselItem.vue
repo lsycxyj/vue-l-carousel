@@ -8,7 +8,7 @@
 </style>
 
 <template>
-	<div @click="console.log(this)" class="v-carousel-item">
+	<div class="v-carousel-item">
 		<slot></slot>
 	</div>
 </template>

@@ -14,10 +14,10 @@ const EV_CHANGED_INDEX = 'changed-index',
 	EV_TOUCHSTART = 'touchstart',
 	EV_TOUCHMOVE = 'touchmove',
 	EV_TOUCHEND = 'touchend',
-	EV_MOUSEDOWN = 'mousedown',
-	EV_MOUSEMOVE = 'mousemove',
+	EV_MOUSE_DOWN = 'mousedown',
+	EV_MOUSE_MOVE = 'mousemove',
 	EV_MOUSE_UP = 'mouseup',
-	
+
 	TIME_LAG = 100;
 
 
@@ -348,7 +348,7 @@ describe('Suite: test Carousel.vue', () => {
 			$carouselItems = $el.find('.v-carousel-items'),
 			$prevBtn = $el.find('.v-carousel-nav.prev'),
 			$nextBtn = $el.find('.v-carousel-nav.next'),
-			
+
 			CAROUSEL_WIDTH = $carousel.width();
 
 		// v-show doesn't show at first
@@ -430,7 +430,7 @@ describe('Suite: test Carousel.vue', () => {
 			$carouselItems = $el.find('.v-carousel-items'),
 			$prevBtn = $el.find('.v-carousel-nav.prev'),
 			$nextBtn = $el.find('.v-carousel-nav.next'),
-			
+
 			CAROUSEL_WIDTH = $carousel.width();
 
 		// v-show doesn't show at first
@@ -491,7 +491,7 @@ describe('Suite: test Carousel.vue', () => {
 					});
 				}))
 				.then(() => new Promise((resolve, reject) => {
-					vm.loop = false; 
+					vm.loop = false;
 					vm.list = COMMON_LIST;
 					vm.$nextTick(() => {
 						expect($nextBtn.css('display')).not.toBe('none');
@@ -770,7 +770,7 @@ describe('Suite: test Carousel.vue', () => {
 			refCar = vm.$refs.car,
 			lastIndex = COMMON_LIST.length - 1,
 			pointer = createVirtualPointer(),
-			
+
 			elOffset = $carousel[0].getBoundingClientRect(),
 			elTop = elOffset.top,
 			elLeft = elOffset.left,
@@ -782,26 +782,166 @@ describe('Suite: test Carousel.vue', () => {
 			EXTRA_PX = 1;
 
 		vm.$nextTick(() => {
-			// Touch
-			new Promise((resolve, reject) => {
-				const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-				pointer.x = elCenterX;
-				pointer.y = elCenterY;
-				pointer.trigger(EV_MOUSEDOWN);
+			// I haven't found a good way to simulate touch event, use mouse events instead.
+			Promise.resolve()
+				.then(() => new Promise((resolve, reject) => {
+					const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					pointer.x = elCenterX;
+					pointer.y = elCenterY;
+					pointer.trigger(EV_MOUSE_DOWN);
 
-				pointer.x = elCenterX - dragSnapLimit - EXTRA_PX;
-				pointer.trigger(EV_MOUSEMOVE);
+					pointer.x = elCenterX - dragSnapLimit + EXTRA_PX;
+					pointer.trigger(EV_MOUSE_MOVE);
 
-				const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-				expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit - EXTRA_PX);
+					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit + EXTRA_PX);
 
-				pointer.trigger(EV_MOUSE_UP);
+					pointer.trigger(EV_MOUSE_UP);
 
-				setTimeout(() => {
-					expect(refCar.activeIndex).toBe(lastIndex);
-					resolve();
-				}, COMMON_SPEED_TIME + TIME_LAG);
-			})
+					setTimeout(() => {
+						expect(refCar.activeIndex).toBe(0);
+						resolve();
+					}, COMMON_SPEED_TIME + TIME_LAG);
+				}))
+				.then(() => new Promise((resolve, reject) => {
+					const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					pointer.x = elCenterX;
+					pointer.y = elCenterY;
+					pointer.trigger(EV_MOUSE_DOWN);
+
+					pointer.x = elCenterX + dragSnapLimit - EXTRA_PX;
+					pointer.trigger(EV_MOUSE_MOVE);
+
+					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					expect(nItemsLeft).toBe(oItemsLeft + dragSnapLimit - EXTRA_PX);
+
+					pointer.trigger(EV_MOUSE_UP);
+
+					setTimeout(() => {
+						expect(refCar.activeIndex).toBe(0);
+						resolve();
+					}, COMMON_SPEED_TIME + TIME_LAG);
+				}))
+				.then(() => new Promise((resolve, reject) => {
+					const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					pointer.x = elCenterX;
+					pointer.y = elCenterY;
+					pointer.trigger(EV_MOUSE_DOWN);
+
+					pointer.x = elCenterX - dragSnapLimit - EXTRA_PX;
+					pointer.trigger(EV_MOUSE_MOVE);
+
+					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit - EXTRA_PX);
+
+					pointer.trigger(EV_MOUSE_UP);
+
+					setTimeout(() => {
+						expect(refCar.activeIndex).toBe(1);
+						resolve();
+					}, COMMON_SPEED_TIME + TIME_LAG);
+				}))
+				.then(() => new Promise((resolve, reject) => {
+					const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					pointer.x = elCenterX;
+					pointer.y = elCenterY;
+					pointer.trigger(EV_MOUSE_DOWN);
+
+					pointer.x = elCenterX + dragSnapLimit + EXTRA_PX;
+					pointer.trigger(EV_MOUSE_MOVE);
+
+					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					expect(nItemsLeft).toBe(oItemsLeft + dragSnapLimit + EXTRA_PX);
+
+					pointer.trigger(EV_MOUSE_UP);
+
+					setTimeout(() => {
+						expect(refCar.activeIndex).toBe(0);
+						resolve();
+					}, COMMON_SPEED_TIME + TIME_LAG);
+				}))
+				.then(() => new Promise((resolve, reject) => {
+					const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					pointer.x = elCenterX;
+					pointer.y = elCenterY;
+					pointer.trigger(EV_MOUSE_DOWN);
+
+					pointer.x = elCenterX + dragSnapLimit + EXTRA_PX;
+					pointer.trigger(EV_MOUSE_MOVE);
+
+					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					expect(nItemsLeft).toBe(oItemsLeft + dragSnapLimit + EXTRA_PX);
+
+					pointer.trigger(EV_MOUSE_UP);
+
+					setTimeout(() => {
+						expect(refCar.activeIndex).toBe(lastIndex);
+						resolve();
+					}, COMMON_SPEED_TIME + TIME_LAG);
+				}))
+				.then(() => new Promise((resolve, reject) => {
+					const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					pointer.x = elCenterX;
+					pointer.y = elCenterY;
+					pointer.trigger(EV_MOUSE_DOWN);
+
+					pointer.x = elCenterX - dragSnapLimit - EXTRA_PX;
+					pointer.trigger(EV_MOUSE_MOVE);
+
+					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+					expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit - EXTRA_PX);
+
+					pointer.trigger(EV_MOUSE_UP);
+
+					setTimeout(() => {
+						expect(refCar.activeIndex).toBe(0);
+						resolve();
+					}, COMMON_SPEED_TIME + TIME_LAG);
+				}))
+				.then(() => new Promise((resolve, reject) => {
+					vm.loop = false;
+					vm.$nextTick(() => {
+						const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+						pointer.x = elCenterX;
+						pointer.y = elCenterY;
+						pointer.trigger(EV_MOUSE_DOWN);
+
+						pointer.x = elCenterX + dragSnapLimit + EXTRA_PX;
+						pointer.trigger(EV_MOUSE_MOVE);
+
+						const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+						expect(nItemsLeft).toBe(oItemsLeft + dragSnapLimit + EXTRA_PX);
+
+						pointer.trigger(EV_MOUSE_UP);
+
+						setTimeout(() => {
+							expect(refCar.activeIndex).toBe(0);
+							resolve();
+						}, COMMON_SPEED_TIME + TIME_LAG);
+					});
+				}))
+				.then(() => new Promise((resolve, reject) => {
+					refCar.$emit(EV_TO, lastIndex);
+					setTimeout(() => {
+						const oItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+						pointer.x = elCenterX;
+						pointer.y = elCenterY;
+						pointer.trigger(EV_MOUSE_DOWN);
+
+						pointer.x = elCenterX - dragSnapLimit - EXTRA_PX;
+						pointer.trigger(EV_MOUSE_MOVE);
+
+						const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
+						expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit - EXTRA_PX);
+
+						pointer.trigger(EV_MOUSE_UP);
+
+						setTimeout(() => {
+							expect(refCar.activeIndex).toBe(lastIndex);
+							resolve();
+						}, COMMON_SPEED_TIME + TIME_LAG);
+					}, COMMON_SPEED_TIME + TIME_LAG);
+				}))
 				.then(done);
 		});
 	});
