@@ -6,6 +6,7 @@ import {Carousel, CarouselItem} from '../../../src/index';
 import {createVM, destroyVM, createVirtualPointer} from '../util';
 
 const EV_CHANGED_INDEX = 'changed-index',
+	EV_RENDER_UPDATED = 'render-updated',
 	EV_PREV = 'prev',
 	EV_NEXT = 'next',
 	EV_TO = 'to',
@@ -748,6 +749,46 @@ describe('Suite: test Carousel.vue', () => {
 				resolve();
 			}))
 			.then(() => runTest(lastIndex))
+			.then(done);
+	});
+
+	it('render-updated event', (done) => {
+		const changedSpy = jasmine.createSpy();
+		let i = 0;
+
+		setup({
+			data() {
+				return {
+					...COMMON_DATA,
+					list: []
+				};
+			},
+			mounted() {
+				this.$refs.car.$on(EV_CHANGED_INDEX, changedSpy);
+			}
+		});
+
+		new Promise((resolve, reject) => {
+			vm.list = COMMON_LIST;
+			vm.$nextTick(() => {
+				expect(changedSpy.calls.count()).toBe(++i);
+				resolve();
+			});
+		})
+			.then(() => new Promise((resolve, reject) => {
+				vm.loop = !vm.loop;
+				vm.$nextTick(() => {
+					expect(changedSpy.calls.count()).toBe(++i);
+					resolve();
+				});
+			}))
+			.then(() => new Promise((resolve, reject) => {
+				vm.rewind = !vm.rewind;
+				vm.$nextTick(() => {
+					expect(changedSpy.calls.count()).toBe(++i);
+					resolve();
+				});
+			}))
 			.then(done);
 	});
 
