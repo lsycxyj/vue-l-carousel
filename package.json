@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "webpack --config ./build/webpack.dev.conf.js --watch",
-    "test": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run"
+    "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run"
   },
   "repository": {
     "type": "git",
@@ -52,11 +52,14 @@
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-react": "^6.9.0",
     "file-loader": "^0.9.0",
+    "function-bind": "^1.1.0",
     "jasmine": "^2.5.3",
     "jquery": "^3.1.1",
     "karma": "^1.4.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-coverage": "^1.1.1",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-ie-launcher": "^1.0.0",
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-sourcemap-loader": "^0.3.7",
@@ -71,6 +74,7 @@
     "vue-style-loader": "^1.0.0",
     "vue-template-compiler": "^2.1.0",
     "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2",
     "webpack-merge": "^2.3.1"
   },
   "engines": {

@@ -14,12 +14,7 @@ var webpackConfig = merge(baseConfig, {
 		loaders: {
 			js: 'babel-loader'
 		}
-	},
-	plugins: [
-		new webpack.DefinePlugin({
-			'process.env': require('../../config/test.env')
-		})
-	]
+	}
 });
 
 // no need for app entry during tests
@@ -101,7 +96,13 @@ module.exports = function (config) {
 
 		// start these browsers
 		// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-		browsers: ['PhantomJS'],
+		browsers: [
+			'PhantomJS',
+			'Chrome',
+			// This doesn't seem to work
+			// 'Firefox',
+			'IE'
+		],
 
 
 		// Continuous Integration mode

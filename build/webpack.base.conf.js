@@ -6,7 +6,7 @@ var projectRoot = path.resolve(__dirname, '../'),
 
 module.exports = {
 	entry: {
-		app: './demo/src/main.js'
+		app: path.resolve(config.path.demo, 'src/main.js')
 	},
 	output: {
 		path: config.path.demoJS,
@@ -63,7 +63,7 @@ module.exports = {
 	vue: {
 		postcss: [
 			require('autoprefixer')({
-				browsers: ['last 2 versions']
+				browsers: ['> 5%']
 			})
 		]
 	}

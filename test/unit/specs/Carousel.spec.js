@@ -1,6 +1,5 @@
 // TODO not all tested
 
-import Vue from 'vue';
 import $ from 'jquery';
 import {Carousel, CarouselItem} from '../../../src/index';
 import {createVM, destroyVM, createVirtualPointer} from '../util';
@@ -764,7 +763,7 @@ describe('Suite: test Carousel.vue', () => {
 				};
 			},
 			mounted() {
-				this.$refs.car.$on(EV_CHANGED_INDEX, changedSpy);
+				this.$refs.car.$on(EV_RENDER_UPDATED, changedSpy);
 			}
 		});
 
@@ -835,7 +834,7 @@ describe('Suite: test Carousel.vue', () => {
 					pointer.trigger(EV_MOUSE_MOVE);
 
 					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-					expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit + EXTRA_PX);
+					expect(nItemsLeft).toBeCloseTo(oItemsLeft - dragSnapLimit + EXTRA_PX, 0);
 
 					pointer.trigger(EV_MOUSE_UP);
 
@@ -854,7 +853,7 @@ describe('Suite: test Carousel.vue', () => {
 					pointer.trigger(EV_MOUSE_MOVE);
 
 					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-					expect(nItemsLeft).toBe(oItemsLeft + dragSnapLimit - EXTRA_PX);
+					expect(nItemsLeft).toBeCloseTo(oItemsLeft + dragSnapLimit - EXTRA_PX, 0);
 
 					pointer.trigger(EV_MOUSE_UP);
 
@@ -873,7 +872,7 @@ describe('Suite: test Carousel.vue', () => {
 					pointer.trigger(EV_MOUSE_MOVE);
 
 					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-					expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit - EXTRA_PX);
+					expect(nItemsLeft).toBeCloseTo(oItemsLeft - dragSnapLimit - EXTRA_PX, 0);
 
 					pointer.trigger(EV_MOUSE_UP);
 
@@ -892,7 +891,7 @@ describe('Suite: test Carousel.vue', () => {
 					pointer.trigger(EV_MOUSE_MOVE);
 
 					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-					expect(nItemsLeft).toBe(oItemsLeft + dragSnapLimit + EXTRA_PX);
+					expect(nItemsLeft).toBeCloseTo(oItemsLeft + dragSnapLimit + EXTRA_PX, 0);
 
 					pointer.trigger(EV_MOUSE_UP);
 
@@ -911,7 +910,7 @@ describe('Suite: test Carousel.vue', () => {
 					pointer.trigger(EV_MOUSE_MOVE);
 
 					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-					expect(nItemsLeft).toBe(oItemsLeft + dragSnapLimit + EXTRA_PX);
+					expect(nItemsLeft).toBeCloseTo(oItemsLeft + dragSnapLimit + EXTRA_PX, 0);
 
 					pointer.trigger(EV_MOUSE_UP);
 
@@ -930,7 +929,7 @@ describe('Suite: test Carousel.vue', () => {
 					pointer.trigger(EV_MOUSE_MOVE);
 
 					const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-					expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit - EXTRA_PX);
+					expect(nItemsLeft).toBeCloseTo(oItemsLeft - dragSnapLimit - EXTRA_PX, 0);
 
 					pointer.trigger(EV_MOUSE_UP);
 
@@ -951,7 +950,7 @@ describe('Suite: test Carousel.vue', () => {
 						pointer.trigger(EV_MOUSE_MOVE);
 
 						const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-						expect(nItemsLeft).toBe(oItemsLeft + dragSnapLimit + EXTRA_PX);
+						expect(nItemsLeft).toBeCloseTo(oItemsLeft + dragSnapLimit + EXTRA_PX, 0);
 
 						pointer.trigger(EV_MOUSE_UP);
 
@@ -973,7 +972,7 @@ describe('Suite: test Carousel.vue', () => {
 						pointer.trigger(EV_MOUSE_MOVE);
 
 						const nItemsLeft = $carouselItems[0].getBoundingClientRect().left;
-						expect(nItemsLeft).toBe(oItemsLeft - dragSnapLimit - EXTRA_PX);
+						expect(nItemsLeft).toBeCloseTo(oItemsLeft - dragSnapLimit - EXTRA_PX, 0);
 
 						pointer.trigger(EV_MOUSE_UP);
 

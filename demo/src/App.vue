@@ -4,7 +4,7 @@
 }
 </style>
 <template>
-	<div id="app">
+	<div>
 		<h3>Vue Carousel Example</h3>
 		<carousel ref="car" @changed-index="log" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind" :mouseDrag="true">
 			<carousel-item v-for="(item, index) in list">
