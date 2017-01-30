@@ -85,9 +85,23 @@ function createVirtualPointer() {
 	}
 }
 
+function cssTextToObject(txt) {
+	const result = {};
+	txt.split(';').forEach((term) => {
+		const splits = term.split(':');
+		if(splits && splits.length == 2) {
+			const key = splits[0].trim(),
+				value = splits[1].trim();
+			result[key] = value;
+		}
+	});
+	return result;
+}
+
 export  {
 	destroyVM,
 	createAndReplaceElem,
 	createVM,
 	createVirtualPointer,
+	cssTextToObject
 };

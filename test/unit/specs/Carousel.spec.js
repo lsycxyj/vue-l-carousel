@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import {Carousel, CarouselItem} from '../../../src/index';
-import {createVM, destroyVM, createVirtualPointer} from '../util';
+import {cssTextToObject, createVM, destroyVM, createVirtualPointer} from '../util';
 
 const EV_CHANGED_INDEX = 'changed-index',
 	EV_RENDER_UPDATED = 'render-updated',
@@ -20,6 +20,7 @@ const EV_CHANGED_INDEX = 'changed-index',
 
 	TIME_LAG = 100;
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 20 * 1000;
 
 describe('Suite: test Carousel.vue', () => {
 	const COMMON_SPEED_TIME = 300,
@@ -207,7 +208,7 @@ describe('Suite: test Carousel.vue', () => {
 		const $el = $(vm.$el),
 			$elCarouselDots = $el.find('.v-carousel-dots');
 		// string style
-		expect($elCarouselDots.attr('style')).toBe('position: relative;')
+		expect(cssTextToObject($elCarouselDots.attr('style'))).toEqual(cssTextToObject('position: relative;'));
 
 		vm.dotsStyle = {
 			position: 'absolute'
@@ -216,7 +217,7 @@ describe('Suite: test Carousel.vue', () => {
 		new Promise((resolve, reject) => {
 			vm.$nextTick(() => {
 				// object style
-				expect($elCarouselDots.attr('style')).toBe('position: absolute;')
+				expect(cssTextToObject($elCarouselDots.attr('style'))).toEqual(cssTextToObject('position: absolute;'));
 				resolve();
 			});
 		})
@@ -229,7 +230,7 @@ describe('Suite: test Carousel.vue', () => {
 				const promise = new Promise((resolve, reject) => {
 					vm.$nextTick(() => {
 						// array style
-						expect($elCarouselDots.attr('style')).toBe('position: relative; left: 50%;');
+						expect(cssTextToObject($elCarouselDots.attr('style'))).toEqual(cssTextToObject('position: relative; left: 50%;'));
 						resolve();
 					});
 				});
@@ -647,6 +648,13 @@ describe('Suite: test Carousel.vue', () => {
 				}))
 				.then(() => new Promise((resolve, reject) => {
 					refCar.$emit(EV_TO, 1);
+					setTimeout(() => {
+						expect(refCar.activeIndex).toBe(1);
+						resolve();
+					}, COMMON_SPEED_TIME + TIME_LAG);
+				}))
+				.then(() => new Promise((resolve, reject) => {
+					refCar.$emit(EV_TO, COMMON_LIST.length);
 					setTimeout(() => {
 						expect(refCar.activeIndex).toBe(1);
 						resolve();

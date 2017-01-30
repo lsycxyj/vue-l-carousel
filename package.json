@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "webpack --config ./build/webpack.dev.conf.js --watch",
-    "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run"
+    "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
+    "e2e": "webpack --config ./build/webpack.e2e.conf.js && node test/e2e/runner.js"
   },
   "repository": {
     "type": "git",
@@ -58,6 +59,7 @@
     "karma": "^1.4.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-coverage": "^1.1.1",
+    "karma-edge-launcher": "^0.2.0",
     "karma-firefox-launcher": "^1.0.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-jasmine": "^1.1.0",
@@ -67,6 +69,7 @@
     "karma-webpack": "^2.0.1",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
+    "nightwatch": "^0.9.12",
     "phantomjs-prebuilt": "^2.1.14",
     "simulant": "^0.2.2",
     "url-loader": "^0.5.7",
@@ -74,7 +77,6 @@
     "vue-style-loader": "^1.0.0",
     "vue-template-compiler": "^2.1.0",
     "webpack": "^1.14.0",
-    "webpack-dev-server": "^1.16.2",
     "webpack-merge": "^2.3.1"
   },
   "engines": {
