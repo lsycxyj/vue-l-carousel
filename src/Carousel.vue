@@ -61,9 +61,9 @@
 				 v-for="(item, index) in watchItems"></div>
 		</div>
 		<div class="v-carousel-nav prev" @click="prev" v-show="hasLoop || (itemsLen > 1 && activeIndex > 0)"
-			 v-html="prevHTML"></div>
+			 v-html="prevHtml"></div>
 		<div class="v-carousel-nav next" @click="next" v-show="hasLoop || (itemsLen > 1 && activeIndex < itemsLen - 1)"
-			 v-html="nextHTML"></div>
+			 v-html="nextHtml"></div>
 		<slot name="after"></slot>
 	</div>
 </template>
@@ -158,12 +158,12 @@ export {
 export default {
 	props: {
 		// HTML content of the previous button.
-		prevHTML: {
+		prevHtml: {
 			type: String,
 			default: '&lt;',
 		},
 		// HTML content of the enext button.
-		nextHTML: {
+		nextHtml: {
 			type: String,
 			default: '&gt;',
 		},

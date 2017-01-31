@@ -1,15 +1,14 @@
 {
-  "name": "vue-carousel",
+  "name": "vue-l-carousel",
   "version": "1.0.0",
-  "description": "A carousel component for Vue.js v2.x+",
+  "description": "A responsive carousel(namely slider or swiper) component for Vue.js v2.x+.",
   "main": "dist/index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "dev": "webpack --config ./build/webpack.dev.conf.js --watch",
-    "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
-    "e2e": "webpack --config ./build/webpack.e2e.conf.js && node test/e2e/runner.js"
+    "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run"
   },
   "repository": {
     "type": "git",
@@ -69,7 +68,6 @@
     "karma-webpack": "^2.0.1",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
-    "nightwatch": "^0.9.12",
     "phantomjs-prebuilt": "^2.1.14",
     "simulant": "^0.2.2",
     "url-loader": "^0.5.7",

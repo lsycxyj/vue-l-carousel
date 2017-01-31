@@ -6,7 +6,7 @@
 <template>
 	<div>
 		<h3>Vue Carousel Example</h3>
-		<carousel ref="car" @changed-index="log" :auto="auto" :watchItems="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind" :mouseDrag="true">
+		<carousel ref="car" @changed-index="log" :auto="auto" :watch-items="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind" :mouse-drag="true">
 			<carousel-item v-for="(item, index) in list">
 				<p>CarouselItem{{index}}, URL is {{item.url}}</p>
 			</carousel-item>
