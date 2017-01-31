@@ -5,5 +5,5 @@ var
 
 module.exports = webpackMerge(baseWebpackConfig, {
 	// eval-source-map is faster for development
-	devtool: '#source-map'
+	devtool: '#eval-source-map'
 });

@@ -2,6 +2,7 @@
 
 > A responsive carousel(namely slider or swiper) component for Vue.js v2.x+. [Live demo](https://todo.html)
 
+### Pull requests are welcome. :)
 
 [![NPM version][npm-image]][npm-url]
 [![npm download][download-image]][download-url]
@@ -17,6 +18,7 @@ LGPL-V3
 - High performance with GPU acceleration and transition animations
 - Available to be styled with CSS
 - Event-based API and notification
+- Footprint: 5.83 Kbs with gzip
 
 ## Installation
 
