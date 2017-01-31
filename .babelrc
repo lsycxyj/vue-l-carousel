@@ -3,11 +3,6 @@
     "es2015",
     "stage-2"
   ],
-  "plugins": [
-    "transform-runtime",
-    "syntax-async-functions",
-    "transform-regenerator"
-  ],
   "comments": false,
   "env": {
     "test": {

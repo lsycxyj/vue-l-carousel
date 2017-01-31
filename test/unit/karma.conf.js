@@ -19,6 +19,8 @@ var webpackConfig = merge(baseConfig, {
 
 // no need for app entry during tests
 delete webpackConfig.entry;
+// library required
+delete webpackConfig.externals;
 
 // Use babel for test files too
 webpackConfig.module.loaders.some(function (loader, i) {

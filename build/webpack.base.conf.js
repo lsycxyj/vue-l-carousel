@@ -22,6 +22,9 @@ module.exports = {
 	resolveLoader: {
 		fallback: [path.join(__dirname, '../node_modules')]
 	},
+	externals: {
+		'vue': 'Vue'
+	},
 	module: {
 		preLoaders: [
 			{
@@ -44,7 +47,8 @@ module.exports = {
 		loaders: [
 			{
 				test: /\.vue$/,
-				loader: 'vue-loader'
+				loader: 'vue-loader',
+				exclude: /node_modules/
 			},
 			{
 				test: /\.js$/,

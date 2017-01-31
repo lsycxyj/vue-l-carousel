@@ -74,6 +74,9 @@ import $ from './util';
 
 const win = window,
 	navigator = win.navigator,
+	String = win.String,
+	Number = win.Number,
+	Boolean = win.Boolean,
 	ua = navigator.userAgent || navigator.appVersion,
 	/* eslint no-nested-ternary: 0 */
 	vendor = (/webkit/i).test(ua) ? 'webkit' : (/firefox/i).test(ua) ? 'moz' : 'opera' in win ? 'o' : '',
@@ -323,7 +326,7 @@ export default {
 
 				$itemsWrap = me.itemsWrap;
 
-			let $cloneItems = me.cloneItems,
+			var $cloneItems = me.cloneItems,
 				$items;
 
 			// clean up
@@ -488,7 +491,7 @@ export default {
 				itemsLen = me.itemsLen,
 				lastItemIndex = itemsLen - 1,
 				activeIndex = me.activeIndex;
-			let index;
+			var index;
 
 			if (dir == DIR_PREV) {
 				if (activeIndex == 0) {
@@ -538,7 +541,7 @@ export default {
 				addAnimation = me.addAnim,
 				go = me.to;
 
-			let realIndex,
+			var realIndex,
 				onSlideEnd;
 
 			if (hasLoop) {
@@ -609,7 +612,7 @@ export default {
 				elWidth = getWidth($el),
 				currentPos = getCurrentPos($itemsWrap);
 
-			let start = {
+			var start = {
 					time: Date.now(),
 					coords: [
 						data.pageX,
@@ -709,7 +712,7 @@ export default {
 			});
 		},
 		getEv(e) {
-			let obj;
+			var obj;
 			if (e.targetTouches) {
 				obj = e.targetTouches[0];
 			}
