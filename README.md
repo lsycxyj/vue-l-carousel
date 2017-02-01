@@ -15,7 +15,6 @@ LGPL-V3
 - High performance with GPU acceleration and transition animations
 - Available to be styled with CSS
 - Event-based API and notification
-- Footprint: 5.83 Kbs with gzip
 
 ## Installation
 
