@@ -6,4 +6,4 @@ node_js:
 install:
   - npm install --dev
 script:
-  - npm unit
+  - npm run-script unit
