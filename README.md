@@ -5,6 +5,7 @@
 ### Pull requests are welcome :)
 
 ![Build Status](https://travis-ci.org/lsycxyj/vue-l-carousel.svg?branch=master)
+[![Coverage](https://img.shields.io/codecov/c/github/lsycxyj/vue-l-carousel/master.svg)](https://codecov.io/github/lsycxyj/vue-l-carousel?branch=master)
 
 ## License
 LGPL-V3  
