@@ -100,10 +100,11 @@ module.exports = function (config) {
 		// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
 		browsers: [
 			'PhantomJS',
-			'Chrome',
 			// This doesn't seem to work
 			// 'Firefox',
-			'IE',
+			// Uncomment Chrome and IE for development since Travis doesn't have these browsers
+			// 'Chrome',
+			// 'IE',
 			// Simulated events don't always work
 			// 'Edge'
 		],
