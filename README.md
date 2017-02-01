@@ -2,7 +2,9 @@
 
 > A responsive carousel(namely slider or swiper) component for Vue.js v2.x+. [Live demo](https://todo.html)
 
-### Pull requests are welcome. :)
+### Pull requests are welcome :)
+
+![Build Status](https://travis-ci.org/lsycxyj/vue-l-carousel.svg?branch=master)
 
 ## License
 LGPL-V3  
