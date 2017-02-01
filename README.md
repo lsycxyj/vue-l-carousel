@@ -1,6 +1,6 @@
 # vue-l-carousel
 
-> A responsive carousel(namely slider or swiper) component for Vue.js v2.x+. [Live demo](https://todo.html)
+> A responsive carousel(namely slider or swiper) component for Vue.js v2.x+. [Live demo](https://cdn.rawgit.com/lsycxyj/vue-l-carousel/master/demo/index.html)
 
 ### Pull requests are welcome :)
 
@@ -189,7 +189,7 @@ Notice:
         <tr>
             <td>to</td>
             <td>Receive</td>
-            <td>`index`</td>
+            <td><pre>index</pre></td>
             <td>Make carousel go to the specific index of slide.</td>
         </tr>
     </tbody>
