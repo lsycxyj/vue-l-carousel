@@ -391,19 +391,21 @@ export default {
 
 			if (mouseDrag) {
 				// DragSnap support
-				bindEvent(itemsWrap, EV_MOUSE_DOWN, startCB);
 				EV_MOVE.push(EV_MOUSE_MOVE);
 				EV_END.push(EV_MOUSE_UP);
 			}
 
 			if (hasTouch) {
-				bindEvent(itemsWrap, EV_TOUCH_START, startCB);
 				EV_MOVE.push(EV_TOUCH_MOVE);
 				EV_END.push(EV_TOUCH_END);
 			}
 
 			me.EV_MOVE = EV_MOVE;
 			me.EV_END = EV_END;
+
+			/* eslint no-unused-expressions: 0 */
+			mouseDrag && bindEvent(itemsWrap, EV_MOUSE_DOWN, startCB);
+			hasTouch && bindEvent(itemsWrap, EV_TOUCH_START, startCB);
 		},
 		unbindDrag() {
 			const me = this;
@@ -673,6 +675,7 @@ export default {
 			function dragsnap(dir) {
 				me.nextPrev(dir);
 			}
+
 
 			bindEvent($itemsWrap, EV_MOVE, moveHandler);
 			oneEvent($itemsWrap, EV_END, (e) => {

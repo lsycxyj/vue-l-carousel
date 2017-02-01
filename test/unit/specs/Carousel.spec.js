@@ -67,7 +67,7 @@ describe('Suite: test Carousel.vue', () => {
 		vm = createVM(
 			`
 				<div>
-					<carousel ref="car" :watchItems="list" :prev-html="prevHTML" :next-html="nextHTML" :speed="speed" :loop="loop" :rewind="rewind" :mouseDrag="mouseDrag" :auto="auto" :dots="dots" :dots-style="dotsStyle">
+					<carousel ref="car" :watch-items="list" :prev-html="prevHTML" :next-html="nextHTML" :speed="speed" :loop="loop" :rewind="rewind" :mouseDrag="mouseDrag" :auto="auto" :dots="dots" :dots-style="dotsStyle">
 						<carousel-item v-for="(item, index) in list">
 							<p>CarouselItem{{index}}, URL is {{item.url}}</p>
 						</carousel-item>

@@ -6,7 +6,7 @@
 <template>
 	<div>
 		<h3>Vue Carousel Example</h3>
-		<carousel ref="car" @changed-index="log" :auto="auto" :watch-items="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind" :mouse-drag="true">
+		<carousel ref="car" @changed-index="log" :auto="auto" :watch-items="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind" :mouse-drag="mouseDrag">
 			<carousel-item v-for="(item, index) in list">
 				<p>CarouselItem{{index}}, URL is {{item.url}}</p>
 			</carousel-item>
@@ -17,6 +17,7 @@
 			<button @click="toggleAuto()">toggle auto: {{auto}}</button>
 			<button @click="toggleLoop()">toggle loop: {{loop}}</button>
 			<button @click="toggleRewind()">toggle rewind: {{rewind}}</button>
+			<button @click="toggleMouseDrag()">toggle mouseDrag: {{mouseDrag}}</button>
 			<button @click="changeList()">change list</button>
 		</div>
 		<div>
@@ -69,7 +70,8 @@ export default {
 			list: list1,
 			speed: 300,
 			loop: true,
-			rewind: false
+			rewind: false,
+			mouseDrag: false
 		};
 	},
 	mounted() {
@@ -88,6 +90,9 @@ export default {
 		},
 		toggleRewind() {
 			this.rewind = !this.rewind;
+		},
+		toggleMouseDrag() {
+			this.mouseDrag = !this.mouseDrag;
 		},
 		log(content) {
 			console.log(content);

@@ -72,7 +72,7 @@ function off(element, ev, callback) {
 		element.removeEventListener(ev, callback);
 	}
 	else if (isArr(ev)) {
-		each(ev, e => on(element, e, callback));
+		each(ev, e => off(element, e, callback));
 	}
 }
 

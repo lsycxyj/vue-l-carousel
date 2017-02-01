@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport"
+	      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+	<title>vue-carousel examples</title>
+</head>
+<body>
+<div id="app">
+	<div>
+		<carousel ref="car" :watch-items="list">
+			<carousel-item v-for="(item, index) in list">
+				<p>CarouselItem{{index}}, URL is {{item.url}}</p>
+			</carousel-item>
+			<div slot="before">Insert node before</div>
+			<div slot="after">Insert node after</div>
+		</carousel>
+	</div>
+</div>
+
+<script src="../node_modules/vue/dist/vue.min.js"></script>
+<script src="../dist/main.js"></script>
+<script>
+	(function (win, Vue) {
+		var VueCarousel = win['vue-l-carousel'],
+				Carousel = VueCarousel.Carousel,
+				CarouselItem = VueCarousel.CarouselItem;
+		new Vue({
+			el: '#app',
+			data: {
+				list: [
+					{
+						url: 'url1'
+					},
+					{
+						url: 'url2'
+					},
+					{
+						url: 'url3'
+					}
+				]
+			},
+			components: {
+				'carousel': Carousel,
+				'carousel-item': CarouselItem
+			}
+		});
+	})(window, Vue);
+</script>
+</body>
+</html>
