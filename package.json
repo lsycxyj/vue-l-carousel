@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://lsycxyj@bitbucket.org/lsycxyj/vue-l-carousel.git"
+    "url": "https://github.com/lsycxyj/vue-l-carousel.git"
   },
   "keywords": [
     "vue",
@@ -24,7 +24,7 @@
   ],
   "author": "Light Leung <lsycxyj@gmail.com>",
   "license": "LGPLv3",
-  "homepage": "https://bitbucket.org/lsycxyj/vue-l-carousel#readme",
+  "homepage": "https://github.com/lsycxyj/vue-l-carousel",
   "dependencies": {
     "vue": "^2.1.8",
     "vue-tap": "^1.0.3"
