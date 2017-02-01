@@ -4,9 +4,6 @@
 
 ### Pull requests are welcome. :)
 
-[![NPM version][npm-image]][npm-url]
-[![npm download][download-image]][download-url]
-
 ## License
 LGPL-V3  
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](http://www.gnu.org/licenses/lgpl-3.0)
@@ -127,13 +124,13 @@ export default {
         <tr>
             <td>dots-style</td>
             <td>[Object, String, Array]</td>
-            <td>`''`</td>
+            <td><pre>''</pre></td>
             <td>Style of v-carousel-dots</td>
         </tr>
         <tr>
             <td>watch-items<sup>[1][2]</sup></td>
             <td>Array</td>
-            <td>`[]`</td>
+            <td><pre>[]</pre></td>
             <td>The original data list used to render the CarouselItems. The component will rerender if this property changes.</td>
         </tr>
     </tbody>
