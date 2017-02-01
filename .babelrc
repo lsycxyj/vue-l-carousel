@@ -7,6 +7,9 @@
   "env": {
     "test": {
       "plugins": [
+        "transform-runtime",
+        "syntax-async-functions",
+        "transform-regenerator",
         "istanbul"
       ]
     }
