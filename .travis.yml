@@ -6,4 +6,4 @@ install:
   - npm install -g karma webpack cross-env codecov
 script:
   - npm run-script unit
-  - cat ./test/unit/coverage/Icov.info | codecov
+  - cat ./test/unit/coverage/lcov.info | codecov
