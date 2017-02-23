@@ -195,7 +195,7 @@ Notice:
     </tbody>
 </table>
 
-## TODO list
+## Well, what's next?
 - Vertical orientation support
 - Load resources via AJAX
 - Add components for dots

@@ -1,10 +1,15 @@
 var path = require('path'),
+	utils = require('./utils'),
 	config = require('./conf'),
 	webpack = require('webpack'),
 	webpackMerge = require('webpack-merge'),
 	baseWebpackConfig = require('./webpack.base.conf.js'),
+	ExtractTextPlugin = require('extract-text-webpack-plugin'),
 	CompressionWebpackPlugin = require('compression-webpack-plugin'),
 	webpackConfig = webpackMerge(baseWebpackConfig, {
+		module: {
+			loaders: utils.styleLoaders({extract: true})
+		},
 		entry: {
 			main: './src/index.js'
 		},
@@ -12,8 +17,14 @@ var path = require('path'),
 		output: {
 			path: config.path.dist,
 			filename: '[name].js',
+			chunkFilename: '[id].[chunkhash].js',
 			libraryTarget: 'umd',
 			library: 'vue-l-carousel'
+		},
+		vue: {
+			loaders: utils.cssLoaders({
+				extract: true
+			})
 		},
 		plugins: [
 			new webpack.optimize.UglifyJsPlugin({
@@ -27,6 +38,7 @@ var path = require('path'),
 				}
 			}),
 			new webpack.optimize.OccurrenceOrderPlugin(),
+			new ExtractTextPlugin('[name].css'),
 			new CompressionWebpackPlugin({
 				asset: '[path].gz[query]',
 				algorithm: 'gzip',
