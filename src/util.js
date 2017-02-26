@@ -166,7 +166,7 @@ function width(element) {
 	return offset(element).width;
 }
 
-const $ = {
+export const $ = {
 	qsa,
 	on,
 	off,
@@ -186,6 +186,3 @@ const $ = {
 	offset,
 	width,
 };
-
-
-export default $;

@@ -70,7 +70,7 @@
 
 <script>
 /* global window */
-import $ from './util';
+import { $ } from './util';
 
 const win = window,
 	navigator = win.navigator,
