@@ -111,8 +111,35 @@ function clone(element, deep) {
 	return element.cloneNode(deep);
 }
 
-function addClass(element, className) {
-	element.classList.add(className);
+function className(element, value) {
+	var klass = element.className || '',
+		svg = klass && klass.baseVal !== undefined;
+
+	if (value === undefined) return svg ? klass.baseVal : klass;
+	if (svg) {
+		klass.baseVal = value;
+	}
+	else {
+		element.className = value;
+	}
+}
+
+function addClass(element, classname) {
+	var classList = element.classList;
+	if (classList) {
+		element.classList.add(classname);
+	}
+	else {
+		const cls = className(element).split(' '),
+			map = {};
+		each(cls, (klass) => {
+			map[klass] = true;
+		});
+
+		if (!map[classname]) {
+			className(element, cls.join(' ') + classname);
+		}
+	}
 }
 
 function remove(element) {

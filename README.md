@@ -63,7 +63,7 @@ export default {
 ```
 ## Carousel configs and API
 ### props
-<table  class="table table-bordered table-striped">
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
             <th style="width: 100px;">Name</th>
@@ -196,8 +196,8 @@ Notice:
 </table>
 
 ## Well, what's next?
+- ~~Load resources via AJAX~~ (For single responsibility, I recommend you to composite with other libraries, [v-l-lazyload](https://github.com/lsycxyj/vue-l-lazyload) for example instead)
 - Vertical orientation support
-- Load resources via AJAX
 - Add components for dots
 - Multiple items in the same page
 - More elegant way to test behaviors
