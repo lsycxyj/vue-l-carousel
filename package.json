@@ -1,6 +1,6 @@
 {
   "name": "vue-l-carousel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A responsive carousel(namely slider or swiper) component for Vue.js v2.x+.",
   "main": "dist/main.js",
   "directories": {

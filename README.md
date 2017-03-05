@@ -196,7 +196,7 @@ Notice:
 </table>
 
 ## Well, what's next?
-- ~~Load resources via AJAX~~ (For single responsibility, I recommend you to composite with other libraries, [v-l-lazyload](https://github.com/lsycxyj/vue-l-lazyload) for example instead)
+- ~~Load resources via AJAX~~ (For single responsibility, I recommend you to composite with other libraries, [v-l-lazyload](https://github.com/lsycxyj/vue-l-lazyload) for [example](https://cdn.rawgit.com/lsycxyj/vue-l-carousel/master/demo/index_with_lazyload.html) instead)
 - Vertical orientation support
 - Add components for dots
 - Multiple items in the same page
