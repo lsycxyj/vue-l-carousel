@@ -1,8 +1,8 @@
 // TODO not all tested
 
 import $ from 'jquery';
-import {Carousel, CarouselItem} from '../../../src/index';
-import {cssTextToObject, createVM, destroyVM, createVirtualPointer} from '../util';
+import { Carousel, CarouselItem } from '../../../src/index';
+import { cssTextToObject, createVM, destroyVM, createVirtualPointer } from '../util';
 
 const EV_CHANGED_INDEX = 'changed-index',
 	EV_RENDER_UPDATED = 'render-updated',
@@ -68,7 +68,7 @@ describe('Suite: test Carousel.vue', () => {
 			`
 				<div>
 					<carousel ref="car" :watch-items="list" :prev-html="prevHTML" :next-html="nextHTML" :speed="speed" :loop="loop" :rewind="rewind" :mouseDrag="mouseDrag" :auto="auto" :dots="dots" :dots-style="dotsStyle">
-						<carousel-item v-for="(item, index) in list">
+						<carousel-item v-for="(item, index) in list" :key="index + ''">
 							<p>CarouselItem{{index}}, URL is {{item.url}}</p>
 						</carousel-item>
 						<div slot="before">Insert node before</div>
@@ -91,7 +91,7 @@ describe('Suite: test Carousel.vue', () => {
 			`
 				<div>
 					<carousel ref="car" :watchItems="list">
-						<carousel-item v-for="(item, index) in list">
+						<carousel-item v-for="(item, index) in list" :key="index + ''">
 							<p>CarouselItem{{index}}, URL is {{item.url}}</p>
 						</carousel-item>
 					</carousel>
@@ -178,8 +178,8 @@ describe('Suite: test Carousel.vue', () => {
 		const $el = $(vm.$el),
 			$prevBtn = $el.find('.v-carousel-nav.prev'),
 			$nextBtn = $el.find('.v-carousel-nav.next');
-		expect($prevBtn.html()).toBe('<b>prev</b>')
-		expect($nextBtn.html()).toBe('<b>next</b>')
+		expect($prevBtn.html()).toBe('<b>prev</b>');
+		expect($nextBtn.html()).toBe('<b>next</b>');
 	});
 
 	it('not show dots', () => {

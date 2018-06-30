@@ -13,6 +13,7 @@ module.exports = {
 		'no-mixed-operators': 0,
 		'no-plusplus': 0,
 		'no-param-reassign': 0,
+		'no-return-assign': 0,
 		'no-multi-assign': 0,
 		'no-var': 0,
 		'linebreak-style': 0,

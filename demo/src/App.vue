@@ -1,13 +1,14 @@
 <style lang="less">
-.v-carousel-item {
-	height: 100px;
-}
+	.v-carousel-item {
+		height: 100px;
+	}
 </style>
 <template>
 	<div>
 		<h3>Vue Carousel Example</h3>
-		<carousel ref="car" @changed-index="log" :auto="auto" :watch-items="list" :dots="true" :loop="loop" :speed="speed" :rewind="rewind" :mouse-drag="mouseDrag">
-			<carousel-item v-for="(item, index) in list">
+		<carousel ref="car" @changed-index="log" :auto="auto" :watch-items="list" :dots="true" :loop="loop"
+		          :speed="speed" :rewind="rewind" :mouse-drag="mouseDrag">
+			<carousel-item v-for="(item, index) in list" :key="index + ''">
 				<p>CarouselItem{{index}}, URL is {{item.url}}</p>
 			</carousel-item>
 			<div slot="before">Insert node before</div>
@@ -31,84 +32,84 @@
 	</div>
 </template>
 <script>
-import { Carousel, CarouselItem } from '../../src/index';
+	import { Carousel, CarouselItem } from '../../src/index';
 
-var list1 = [
-	{
-		url: 'url1'
-	},
-	{
-		url: 'url2'
-	},
-	{
-		url: 'url3'
-	}
-],
-	list2 = [
-	{
-		url: 'url4'
-	},
-	{
-		url: 'url5'
-	},
-	{
-		url: 'url6'
-	},
-	{
-		url: 'url7'
-	}
-];
+	var list1 = [
+			{
+				url: 'url1',
+			},
+			{
+				url: 'url2',
+			},
+			{
+				url: 'url3',
+			},
+		],
+		list2 = [
+			{
+				url: 'url4',
+			},
+			{
+				url: 'url5',
+			},
+			{
+				url: 'url6',
+			},
+			{
+				url: 'url7',
+			},
+		];
 
-export default {
-	components: {
-		'carousel': Carousel,
-		'carousel-item': CarouselItem
-	},
-	data() {
-		return {
-			auto: 30000,
-			list: list1,
-			speed: 300,
-			loop: true,
-			rewind: false,
-			mouseDrag: false
-		};
-	},
-	mounted() {
-		var me = this,
-			car = me.$refs.car;
-		car.$on('changed-index', function(){
-			console.log(arguments);
-		});
-	},
-	methods: {
-		toggleAuto() {
-			this.auto = this.auto === 0 ? 3000 : 0;
+	export default {
+		components: {
+			Carousel,
+			CarouselItem,
 		},
-		toggleLoop() {
-			this.loop = !this.loop;
+		data() {
+			return {
+				auto: 30000,
+				list: list1,
+				speed: 300,
+				loop: true,
+				rewind: false,
+				mouseDrag: false,
+			};
 		},
-		toggleRewind() {
-			this.rewind = !this.rewind;
-		},
-		toggleMouseDrag() {
-			this.mouseDrag = !this.mouseDrag;
-		},
-		log(content) {
-			console.log(content);
-		},
-		to(e) {
-			this.$refs.car.$emit('to', e.target.value);
-		},
-		indexChanged(index, total, item) {
+		mounted() {
 			var me = this,
-				log = me.log;
-			log('Slide end:' + index);
-			log(item);
+				car = me.$refs.car;
+			car.$on('changed-index', function () {
+				console.log(arguments);
+			});
 		},
-		changeList() {
-			this.list = this.list == list1 ? list2 : list1;
-		}
-	}
-};
+		methods: {
+			toggleAuto() {
+				this.auto = this.auto === 0 ? 3000 : 0;
+			},
+			toggleLoop() {
+				this.loop = !this.loop;
+			},
+			toggleRewind() {
+				this.rewind = !this.rewind;
+			},
+			toggleMouseDrag() {
+				this.mouseDrag = !this.mouseDrag;
+			},
+			log(content) {
+				console.log(content);
+			},
+			to(e) {
+				this.$refs.car.$emit('to', e.target.value);
+			},
+			indexChanged(index, total, item) {
+				var me = this,
+					log = me.log;
+				log('Slide end:' + index);
+				log(item);
+			},
+			changeList() {
+				this.list = this.list == list1 ? list2 : list1;
+			},
+		},
+	};
 </script>

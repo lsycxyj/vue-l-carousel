@@ -1,4 +1,4 @@
-/**
+/*
  * @preserve
  * vue-l-carousel
  *

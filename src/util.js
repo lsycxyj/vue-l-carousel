@@ -12,9 +12,9 @@ const win = window,
 	},
 
 	emptyArr = [],
-	slice = emptyArr.slice,
+	{ slice } = emptyArr,
 
-	round = Math.round;
+	{ round } = Math;
 
 function type(o) {
 	return typeof o;
@@ -31,28 +31,36 @@ function isStr(o) {
 function qsa(element, selector) {
 	// From Zepto
 	/* eslint no-nested-ternary: 0 no-cond-assign: 0  */
-	let found;
+	var found;
 	const maybeID = selector[0] == '#',
 		maybeClass = !maybeID && selector[0] == '.',
 		// Ensure that a 1 char tag name still gets checked
 		nameOnly = maybeID || maybeClass ? selector.slice(1) : selector,
 		isSimple = simpleSelectorRE.test(nameOnly);
 	// Safari DocumentFragment doesn't have getElementById
-	return (element.getElementById && isSimple && maybeID) ?
-		((found = element.getElementById(nameOnly)) ? [found] : []) :
-		(element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) ? [] :
-			slice.call(
+	return (element.getElementById && isSimple && maybeID)
+		? ((found = element.getElementById(nameOnly))
+			? [found]
+			: [])
+		: (element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11)
+			? []
+			: slice.call(
 				// DocumentFragment doesn't have getElementsByClassName/TagName
-				isSimple && !maybeID && element.getElementsByClassName ?
+				isSimple && !maybeID && element.getElementsByClassName
 					// If it's simple, it could be a class
-					maybeClass ? element.getElementsByClassName(nameOnly) :
-						element.getElementsByTagName(selector) : // Or a tag
-					element.querySelectorAll(selector), // Or it's not simple, and we need to query all
+					? maybeClass
+						? element.getElementsByClassName(nameOnly)
+						: element.getElementsByTagName(selector)
+					// Or a tag
+					: element.querySelectorAll(selector), // Or it's not simple, and we need to query all
 			);
 }
 
 function each(elements, callback) {
-	for (let i = 0, len = elements.length, element; i < len; i++) {
+	var i = 0,
+		len = elements.length,
+		element;
+	for (; i < len; i++) {
 		element = elements[i];
 		callback.call(element, element, i);
 	}
@@ -125,7 +133,7 @@ function className(element, value) {
 }
 
 function addClass(element, classname) {
-	var classList = element.classList;
+	var { classList } = element;
 	if (classList) {
 		element.classList.add(classname);
 	}
@@ -171,6 +179,7 @@ function css(element, property, value) {
 	if (arguments.length < 3) {
 		return elementSytle[camelize(property)] || getComputedStyle(element, '').getPropertyValue(property);
 	}
+	/* eslint no-else-return: 0 */
 	else if (!value && value !== 0) {
 		elementSytle.removeProperty(dasherize(property));
 	}

@@ -1,44 +1,48 @@
-var path = require('path'),
+const path = require('path'),
 	utils = require('./utils'),
 	config = require('./conf'),
 	webpack = require('webpack'),
+	UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
 	webpackMerge = require('webpack-merge'),
 	baseWebpackConfig = require('./webpack.base.conf.js'),
-	ExtractTextPlugin = require('extract-text-webpack-plugin'),
 	CompressionWebpackPlugin = require('compression-webpack-plugin'),
+	MiniCssExtractPlugin = require('mini-css-extract-plugin'),
 	webpackConfig = webpackMerge(baseWebpackConfig, {
-		module: {
-			loaders: utils.styleLoaders({extract: true})
-		},
 		entry: {
-			main: './src/index.js'
+			main: './src/index.js',
 		},
 		devtool: false,
+		mode: 'production',
 		output: {
 			path: config.path.dist,
 			filename: '[name].js',
 			chunkFilename: '[id].[chunkhash].js',
 			libraryTarget: 'umd',
-			library: 'vue-l-carousel'
+			library: 'vue-l-carousel',
 		},
-		vue: {
-			loaders: utils.cssLoaders({
-				extract: true
-			})
+		optimization: {
+			minimizer: [
+				new UglifyJsPlugin({
+					uglifyOptions: {
+						compress: {
+							warnings: false,
+							dead_code: true,
+							unused: true,
+							collapse_vars: true,
+							reduce_vars: true,
+							loops: true,
+						},
+						// TODO Somehow not work
+						comments: /@preserve/i,
+					},
+				}),
+			],
 		},
 		plugins: [
-			new webpack.optimize.UglifyJsPlugin({
-				compress: {
-					warnings: false,
-					dead_code: true,
-					unused: true,
-					collapse_vars: true,
-					reduce_vars: true,
-					loops: true
-				}
+			new MiniCssExtractPlugin({
+				filename: 'main.css',
 			}),
 			new webpack.optimize.OccurrenceOrderPlugin(),
-			new ExtractTextPlugin('[name].css'),
 			new CompressionWebpackPlugin({
 				asset: '[path].gz[query]',
 				algorithm: 'gzip',
@@ -48,9 +52,9 @@ var path = require('path'),
 					')$'
 				),
 				threshold: 10240,
-				minRatio: 0.8
-			})
-		]
+				minRatio: 0.8,
+			}),
+		],
 	});
 
 delete webpackConfig.entry.app;

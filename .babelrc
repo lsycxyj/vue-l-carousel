@@ -1,7 +1,18 @@
 {
   "presets": [
-    "es2015",
-    "stage-2"
+    [
+      "env",
+      {
+        "targets": [
+          "ie >= 9"
+        ],
+        "loose": true,
+        "modules": false
+      }
+    ]
+  ],
+  "plugins": [
+    "transform-object-rest-spread"
   ],
   "comments": false,
   "env": {

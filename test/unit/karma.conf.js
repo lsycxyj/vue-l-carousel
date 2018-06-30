@@ -1,20 +1,14 @@
 // Karma configuration
-// Generated on Mon Jan 23 2017 12:00:17 GMT+0800 (中国标准时间)
+const path = require('path');
+const merge = require('webpack-merge');
+const baseConfig = require('../../build/webpack.base.conf');
+const webpack = require('webpack');
+const projectRoot = path.resolve(__dirname, '../../');
 
-var path = require('path');
-var merge = require('webpack-merge');
-var baseConfig = require('../../build/webpack.base.conf');
-var webpack = require('webpack');
-var projectRoot = path.resolve(__dirname, '../../');
-
-var webpackConfig = merge(baseConfig, {
+const webpackConfig = merge(baseConfig, {
 	// use inline sourcemap for karma-sourcemap-loader
 	devtool: '#inline-source-map',
-	vue: {
-		loaders: {
-			js: 'babel-loader'
-		}
-	}
+	mode: 'development',
 });
 
 // no need for app entry during tests
@@ -23,9 +17,9 @@ delete webpackConfig.entry;
 delete webpackConfig.externals;
 
 // Use babel for test files too
-webpackConfig.module.loaders.some(function (loader, i) {
+webpackConfig.module.rules.some(function (loader, i) {
 	if (/^babel(-loader)?$/.test(loader.loader)) {
-		loader.include.push(path.resolve(projectRoot, 'test/unit'));
+		loader.include.push(path.resolve(projectRoot, 'test'));
 		return true;
 	}
 });
@@ -44,7 +38,7 @@ module.exports = function (config) {
 
 		// list of files / patterns to load in the browser
 		files: [
-			'./index.js'
+			'./index.js',
 		],
 
 
@@ -55,7 +49,7 @@ module.exports = function (config) {
 		// preprocess matching files before serving them to the browser
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
-			'./index.js': ['webpack', 'sourcemap']
+			'./index.js': ['webpack', 'sourcemap'],
 		},
 
 
@@ -68,15 +62,15 @@ module.exports = function (config) {
 		// webpack
 		webpack: webpackConfig,
 		webpackMiddleware: {
-			noInfo: true
+			noInfo: true,
 		},
 		// Coverage options
 		coverageReporter: {
 			dir: './coverage',
 			reporters: [
-				{type: 'lcov', subdir: '.'},
-				{type: 'text-summary'}
-			]
+				{ type: 'lcov', subdir: '.' },
+				{ type: 'text-summary' },
+			],
 		},
 
 		// web server port
@@ -116,6 +110,6 @@ module.exports = function (config) {
 
 		// Concurrency level
 		// how many browser should be started simultaneous
-		concurrency: Infinity
+		concurrency: Infinity,
 	});
 };
