@@ -202,6 +202,11 @@
 				type: Boolean,
 				default: false,
 			},
+			// It can be drag by touch if it's set to true.
+			touchDrag: {
+				type: Boolean,
+				default: true,
+			},
 			// Autoplay interval. In ms. 0 for no autoplay.
 			auto: {
 				type: Number,
@@ -285,6 +290,7 @@
 			watch('loop', updateRender);
 			watch('rewind', updateRender);
 			watch('mouseDrag', checkDrag);
+			watch('touchDrag', checkDrag);
 			watch('auto', me.checkAuto);
 			watch('activeIndex', emitChangedIndex);
 
@@ -388,7 +394,12 @@
 			},
 			checkDrag() {
 				const me = this,
-					{ mouseDrag, itemsWrap, startCB } = me,
+					{
+						mouseDrag,
+						touchDrag,
+						itemsWrap,
+						startCB,
+					} = me,
 
 					EV_MOVE = [],
 					EV_END = [];
@@ -400,7 +411,7 @@
 					EV_END.push(EV_MOUSE_UP);
 				}
 
-				if (hasTouch) {
+				if (touchDrag && hasTouch) {
 					EV_MOVE.push(EV_TOUCH_MOVE);
 					EV_END.push(EV_TOUCH_END);
 				}
@@ -410,7 +421,7 @@
 
 				/* eslint no-unused-expressions: 0 */
 				mouseDrag && bindEvent(itemsWrap, EV_MOUSE_DOWN, startCB);
-				hasTouch && bindEvent(itemsWrap, EV_TOUCH_START, startCB);
+				touchDrag && hasTouch && bindEvent(itemsWrap, EV_TOUCH_START, startCB);
 			},
 			unbindDrag() {
 				const me = this;

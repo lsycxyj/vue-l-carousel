@@ -112,6 +112,12 @@ export default {
             <td>It can be drag by mouse if it's set to true.</td>
         </tr>
         <tr>
+            <td>touch-drag</td>
+            <td>Boolean</td>
+            <td>true</td>
+            <td>It can be drag by touch if it's set to true.</td>
+        </tr>
+        <tr>
             <td>auto</td>
             <td>Number</td>
             <td>0</td>
